@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi Pembelajaran - MyPhysicsLab</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/materials.css">
+    
+</head>
+<body>
+    <nav>
+        <a href="/" class="nav-brand">MyPhysicsLab</a>
+        <div class="nav-links">
+            <a href="../index.html">Beranda</a>
+            <a href="materials.html" class="active">Materi</a>
+            
+            <a href="quiz.html">Kuis</a>
+            <a href="about.html">About Us</a>
+        </div>
+    </nav>
+    
+    <main>
+        <aside class="material-sidebar">
+            <div class="sidebar-content">
+                <h3>Daftar Materi</h3>
+                <ul class="material-list">
+                    <li class="active" data-section="newton1">Hukum Newton I</li>
+                    <li data-section="newton2">Hukum Newton II</li>
+                    <li data-section="newton3">Hukum Newton III</li>
+                    <li data-section="ohm">Hukum Ohm</li>
+                </ul>
+                
+                <div class="progress-tracker">
+                    <h4>Progress Belajar</h4>
+                    <div class="progress-bar">
+                        <div class="progress" id="learningProgress" role="progressbar" 
+                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <span id="progressText">0%</span>
+                </div>
+            </div>
+        </aside>
+
+        <section class="material-content">
+            <!-- Hukum Newton I -->
+            <article id="newton1" class="material-section active">
+                <h2>Hukum Newton I (Hukum Kelembaman)</h2>
+                <div class="content-wrapper">
+                    <div class="theory-section">
+                        <h3> Apa itu?</h3>
+                        <p>Suatu benda tidak akan bergerak selama gaya yang bekerja padanya adalah nol atau suatu benda yang bergerak lurus akan tetap bergerak jika tidak ada gaya lain yang mempengaruhinya.</p>
+                        <h3>Bunyi Hukum Newton I</h3>
+                        <p>"Jika resultan gaya pada suatu benda sama dengan nol, maka benda yang mula-mula diam akan terus diam. Sedangkan, benda yang mula-mula bergerak, akan terus bergerak dengan kecepatan tetap".</p>
+                        <div class="video-container">
+                            <video width="100%" controls controlsList="nodownload" preload="metadata">
+                                <source src="../assets/videos/newton1.mp4" type="video/mp4">
+                                <source src="../assets/videos/newton1.webm" type="video/webm">
+                                <p>Browser Anda tidak mendukung pemutaran video.</p>
+                            </video>
+                        </div>
+                   
+
+                        <h3>Contoh Sehari-hari</h3>
+                        <ul>
+                            <li>Penumpang terdorong ke depan saat mobil direm mendadak.</li>
+                            <li>Koin yang berada di atas kertas akan jatuh ketika kertas ditarik cepat.</li>
+                            <li>Benda di atas meja yang diam akan tetap diam jika tidak ada gaya yang bekerja.</li>
+                        </ul>
+
+                        <h3>Rumus Matematis</h3>
+                        <div class="formula">
+                            <p>ΣF = 0 (ketika benda diam atau GLB)</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <canvas id="newton1Canvas" width="600" height="300"></canvas>
+                            <div class="controls">
+                                <div class="control-group">
+                                    <label for="newton1Force">Gaya (N):</label>
+                                    <input type="range" id="newton1Force" min="0" max="10" value="0" step="1">
+                                    <span id="newton1ForceValue">0 N</span>
+                            </div>
+                            <button id="startDemo">Mulai Simulasi</button>
+                            <button id="resetDemo">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="practice-section">
+                        <h3>Latihan Interaktif</h3>
+                        <div class="drag-drop-exercise">
+                            <p>Susun pernyataan berikut menjadi urutan yang benar:</p>
+                            <div class="drag-container">
+                                <div class="draggable" draggable="true" data-order="1">
+                                    Benda dalam keadaan diam
+                                </div>
+                                <div class="draggable" draggable="true" data-order="2">
+                                    Tidak ada gaya yang bekerja
+                                </div>
+                                <div class="draggable" draggable="true" data-order="3">
+                                    Benda tetap diam
+                                </div>
+                            </div>
+                            <div class="drop-container">
+                                <div class="drop-zone" data-slot="1"></div>
+                                <div class="drop-zone" data-slot="2"></div>
+                                <div class="drop-zone" data-slot="3"></div>
+                            </div>
+                            <button id="resetDragDrop" class="reset-button">Reset Urutan</button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Hukum Newton II -->
+            <article id="newton2" class="material-section">
+                <h2>Hukum Newton II (Hukum Gaya dan Percepatan)</h2>
+                <div class="content-wrapper">
+                    <div class="theory-section">
+                        <h3>Apa itu?</h3>
+                        <p>Percepatan suatu benda berbanding lurus dengan gaya yang bekerja padanya dan berbanding terbalik dengan massanya. Hasil Eksperimen Newton menunjukkan bahwa gaya yang diberikan pada benda akan menyebabkan benda tersebut mengalami perubahan kecepatan. Ketika gaya tersebut searah dengan gerak benda, kecepatannya bertambah dan ketika gaya tersebut berlawanan dengan gerak benda, kecepatannya berkurang.</p>
+                        <h3>Bunyi Hukum Newton II</h3>
+                        <p>"Sebuah benda dengan massa m mengalami gaya resultan sebesar F akan mengalami percepatan (a) yang arahnya sama dengan arah gaya, dan besarnya berbanding lurus terhadap F dan berbanding terbalik terhadap massa (m)"</p>
+                        <div class="video-container">
+                            <video controls>
+                                <source src="../assets/videos/newton2.mp4" type="video/mp4">
+                                Browser Anda tidak mendukung pemutaran video.
+                            </video>
+                        </div>
+
+                        <h3>Rumus Matematis</h3>
+                        <div class="formula">
+                            <p>F = m × a</p>
+                            <p>Dimana:</p>
+                            <ul>
+                                <li>F = Gaya (Newton)</li>
+                                <li>m = Massa (kg)</li>
+                                <li>a = Percepatan (m/s²)</li>
+                            </ul>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <canvas id="newton2Canvas" width="600" height="300"></canvas>
+                            <div class="controls">
+                                <label>Massa (kg):
+                                    <input type="range" id="massInput" min="1" max="10" value="1">
+                                    <span id="massValue">1</span>
+                                </label>
+                                <label>Gaya (N):
+                                    <input type="range" id="forceInput" min="0" max="50" value="10">
+                                    <span id="forceValue">10</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="practice-section">
+                        <h3>Latihan Soal</h3>
+                        <div class="interactive-problem">
+                            <p>Sebuah benda bermassa 5 kg didorong dengan gaya 20 N. Berapakah percepatannya?</p>
+                            <input type="number" id="problemAnswer" placeholder="Masukkan jawaban">
+                            <button id="checkAnswer">Periksa Jawaban</button>
+                            <p id="answerFeedback"></p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Hukum Newton III -->
+            <article id="newton3" class="material-section">
+                <h2>Hukum Newton III (Hukum Aksi-Reaksi)</h2>
+                <div class="content-wrapper">
+                    <div class="theory-section">
+                        <h3>Apa itu?</h3>
+                        <p>Gaya aksi dan reaksi menunjukkan tiap aksi akan menimbulkan sebuah reaksi. Jika sebuah benda memberikan gaya pada benda lain, maka benda yang mendapat gaya tersebut akan memberikan gaya yang besarnya sama dengan gaya yang diterima dari benda pertama. Namun, arah yang dihasilkan akan berlawanan.</p>
+                        <p> Atau, yang biasa dikenal dengan Faksi = - Freaksi</p>
+                        <h3>Bunyi Hukum Newton III</h3>
+                        <p>"Untuk setiap aksi, ada reaksi yang sama besar dan berlawanan arah."</p>
+                        <div class="video-container">
+                            <video controls>
+                                <source src="../assets/videos/newton3.mp4" type="video/mp4">
+                                Browser Anda tidak mendukung pemutaran video.
+                            </video>
+                        </div>
+
+                        <h3>Contoh Sehari-hari</h3>
+                        <ul>
+                            <li>Mendayung perahu</li>
+                            <li>Balon yang dilepaskan</li>
+                            <li>Roket yang meluncur</li>
+                        </ul>
+
+                        <div class="interactive-demo">
+                            <canvas id="newton3Canvas" width="600" height="300"></canvas>
+                            <div class="controls">
+                                <button id="startRocket">Luncurkan Roket</button>
+                                <button id="resetRocket">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Hukum Ohm -->
+            <article id="ohm" class="material-section">
+                <h2>Hukum Ohm</h2>
+                <div class="content-wrapper">
+                    <div class="theory-section">
+                        <h3>Pengertian</h3>
+                        <p>"Besar arus listrik yang mengalir melalui sebuah penghantar berbanding lurus dengan beda potensial antara ujung-ujung penghantar tersebut dan berbanding terbalik dengan hambatannya."</p>
+                        
+                        <div class="video-container">
+                            <video controls>
+                                <source src="../assets/videos/ohm.mp4" type="video/mp4">
+                                Browser Anda tidak mendukung pemutaran video.
+                            </video>
+                        </div>
+
+                        <h3>Rumus Matematis</h3>
+                        <div class="formula">
+                            <p>V = I × R</p>
+                            <p>Dimana:</p>
+                            <ul>
+                                <li>V = Tegangan (Volt)</li>
+                                <li>I = Arus Listrik (Ampere)</li>
+                                <li>R = Hambatan (Ohm)</li>
+                            </ul>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <canvas id="ohmCanvas" width="600" height="300"></canvas>
+                            <div class="controls">
+                                <label>Tegangan (V):
+                                    <input type="range" id="voltageInput" min="0" max="12" value="6">
+                                    <span id="voltageValue">6</span>
+                                </label>
+                                <label>Hambatan (Ω):
+                                    <input type="range" id="resistanceInput" min="1" max="100" value="10">
+                                    <span id="resistanceValue">10</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>MyPhysicsLab</h4>
+                <p>Platform pembelajaran fisika interaktif untuk semua</p>
+            </div>
+            <div class="footer-section">
+                <h4>Navigasi</h4>
+                <ul>
+                    <li><a href="../index.html">Beranda</a></li>
+                  
+                    <li><a href="quiz.html">Kuis</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Status Koneksi</h4>
+                <div id="connectionStatus">Menghubungkan...</div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 MyPhysicsLab. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script src="../js/materials.js"></script>
+</body>
+</html>

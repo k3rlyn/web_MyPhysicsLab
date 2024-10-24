@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Fisika Interaktif</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/welcome.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-brand">MyPhysicsLab</div>
+            <div class="nav-links">
+                <a href="index.html" class="active">Beranda</a>
+                <a href="pages/materials.html">Materi</a>
+               
+                <a href="pages/quiz.html">Kuis</a>
+                <a href="pages/about.html">About Us</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Selamat Datang di MyPhysicsLab</h1>
+                <p>Pelajari Fisika dengan cara yang menyenangkan dan interaktif</p>
+                
+                <div class="feature-cards">
+                    <div class="card" onclick="window.location.href='pages/materials.html'">
+                        <img src="assets/images/materials-icon.jpg" alt="Materi">
+                        <h3>Materi Pembelajaran</h3>
+                        <p>Pelajari konsep dasar Hukum Newton dan Hukum Ohm</p>
+                    </div>
+                    
+                 
+                    
+                    <div class="card" onclick="window.location.href='pages/quiz.html'">
+                        <img src="assets/images/quiz-icon.jpg" alt="Kuis">
+                        <h3>Kuis Interaktif</h3>
+                        <p>Uji pemahaman Anda dengan kuis yang menarik</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Fitur Unggulan</h2>
+            <div class="features-grid">
+                <article class="feature">
+                    <canvas id="animationCanvas" width="200" height="200"></canvas>
+                    <h3>Visualisasi Interaktif</h3>
+                    <p>Lihat konsep fisika dalam bentuk animasi yang menarik</p>
+                </article>
+
+                <article class="feature">
+                    <video id="demoVideo" controls width="320">
+                        <source src="assets/videos/demo.mp4" type="video/mp4">
+                        Maaf, browser Anda tidak mendukung pemutaran video.
+                    </video>
+                    <h3>Video Pembelajaran Fisika</h3>
+                    <p>Pelajari melalui video penjelasan yang komprehensif</p>
+                </article>
+
+                <article class="feature">
+                    <div id="realTimeUpdates" class="updates-container">
+                        <h3>Pembaruan Real-time</h3>
+                        <img src="assets/images/real-time.png" alt="real time">
+                        <div id="updates-content"></div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="get-started">
+            <h2>Mulai Belajar</h2>
+            <div class="progress-container">
+                <div id="learningProgress" class="progress-bar" role="progressbar" 
+                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    0%
+                </div>
+            </div>
+            <button id="startLearning" class="cta-button">Mulai Sekarang</button>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>MyPhysicsLab</h4>
+                <p>Platform pembelajaran fisika interaktif untuk semua</p>
+            </div>
+            <div class="footer-section">
+                <h4>Navigasi</h4>
+                <ul>
+                    <li><a href="pages/materials.html">Materi</a></li>
+                   
+                    <li><a href="pages/quiz.html">Kuis</a></li>
+                    <li><a href="pages/about.html">About Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Status Koneksi</h4>
+                <div id="connectionStatus">Menghubungkan...</div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 MyPhysicsLab. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script src="js/welcome.js"></script>
+</body>
+</html>

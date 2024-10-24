@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Fisika - MyPhysicsLab</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/quiz.css">
+</head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<body>
+    <header>
+        <nav>
+            <div class="nav-container">
+                <nav>
+                    <a href="../index.html" class="nav-brand">
+                        
+                        MyPhysicsLab
+                    </a>
+                    
+                    <button class="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+            
+                    <ul class="nav-links">
+                        <li><a href="../index.html">Beranda</a></li>
+                        <li><a href="materials.html">Materi</a></li>
+                       
+                        <li><a href="quiz.html" class="active">Kuis</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="quiz-container">
+            <header class="quiz-header">
+                <h1>Kuis Fisika</h1>
+                <div class="quiz-info">
+                    <p>Jumlah Soal: <span id="totalQuestions">10</span></p>
+                    <p>Waktu: <span id="timer">30:00</span></p>
+                    <p>Skor: <span id="score">0</span></p>
+                </div>
+            </header>
+
+            <section class="quiz-content" id="quizContent">
+                <!-- Start Screen -->
+                <div class="start-screen" id="startScreen">
+                    <h2>Selamat Datang di Kuis Fisika!</h2>
+                    <p>Uji pemahaman Anda tentang Hukum Newton dan Hukum Ohm</p>
+                    <div class="instructions">
+                        <h3>Petunjuk:</h3>
+                        <ul>
+                            <li>Kuis terdiri dari 5 soal dalam bentuk pilihan ganda dan 5 soal menyusun konsep</li>
+                            <li>Waktu pengerjaan 30 menit</li>
+                            <li>Tidak ada pengurangan nilai untuk jawaban salah</li>
+                            <li>Pastikan koneksi internet stabil</li>
+                        </ul>
+                    </div>
+                    <button id="startQuiz" class="btn-primary">Mulai Kuis</button>
+                </div>
+
+                <!-- Question Screen -->
+                <div class="question-screen hidden" id="questionScreen">
+                    <div class="question-container">
+                        <div class="question-number">Soal <span id="currentNumber">1</span>/10</div>
+                        <div class="question-text" id="questionText"></div>
+                        <form class="options-container" id="optionsForm">
+                            <!-- Opsi jawaban akan diisi oleh JavaScript -->
+                        </form>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button id="prevQuestion" class="btn-secondary" disabled>Sebelumnya</button>
+                        <button id="nextQuestion" class="btn-primary">Selanjutnya</button>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress" id="quizProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drag & Drop Screen -->
+                <div class="drag-drop-screen hidden" id="dragDropScreen">
+                    <div class="drag-drop-header">
+                        <h2>Bagian 2: Menyusun Konsep</h2>
+                        <div class="question-number">Soal <span id="currentDragDrop">1</span>/5</div>
+                    </div>
+
+                    <div class="drag-drop-container">
+                        <div class="question-text" id="dragDropQuestion"></div>
+                        
+                        <div class="drag-items-container" id="dragItems">
+                            <!-- Items will be populated by JavaScript -->
+                        </div>
+
+                        <div class="drop-zones-container" id="dropZones">
+                            <!-- Drop zones will be populated by JavaScript -->
+                        </div>
+
+                        <div class="explanation hidden" id="dragDropExplanation"></div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button id="prevDragDrop" class="btn-secondary">Sebelumnya</button>
+                        <button id="nextDragDrop" class="btn-primary">Selanjutnya</button>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress" id="dragDropProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Result Screen -->
+                <div class="result-screen hidden" id="resultScreen">
+                    <h2>Hasil Kuis</h2>
+                    <div class="score-container">
+                        <canvas id="scoreCanvas" width="200" height="200"></canvas>
+                        <div class="final-score">
+                            <p>Skor Anda:</p>
+                            <h3 id="finalScore">0</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="answer-review">
+                        <h3>Rangkuman Jawaban</h3>
+                        <div class="review-container" id="reviewContainer">
+                            <!-- diisi JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="reviewAnswers" class="btn-secondary">Lihat Pembahasan</button>
+                        <button id="retakeQuiz" class="btn-primary">Ulangi Kuis</button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="connection-status">
+                Status Koneksi: <span id="connectionStatus">Menghubungkan...</span>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>MyPhysicsLab</h4>
+                <p>Platform pembelajaran fisika interaktif untuk semua</p>
+            </div>
+            <div class="footer-section">
+                <h4>Navigasi</h4>
+                <ul>
+                    <li><a href="../index.html">Beranda</a></li>
+                    <li><a href="materials.html">Materi</a></li>
+                    
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 MyPhysicsLab. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Konfirmasi Selesai</h3>
+            <p>Apakah Anda yakin ingin mengakhiri kuis?</p>
+            <div class="modal-buttons">
+                <button id="cancelSubmit" class="btn-secondary">Batal</button>
+                <button id="confirmSubmit" class="btn-primary">Ya, Selesai</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/quiz.js"></script>
+</body>
+</html>
