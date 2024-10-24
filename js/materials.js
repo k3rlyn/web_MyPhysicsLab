@@ -57,14 +57,39 @@ function updateProgress(section) {
 }
 
 // Load saved progress
-const savedProgress = localStorage.getItem('learningProgress');
-if (savedProgress) {
-    progress = JSON.parse(savedProgress);
+function loadProgress() {
+    const savedProgress = localStorage.getItem('learningProgress');
+    if (savedProgress) {
+        progress = JSON.parse(savedProgress);
+        updateProgressDisplay();
+    } else {
+        // Set initial progress to 0
+        localStorage.setItem('learningProgress', JSON.stringify(progress));
+        updateProgressDisplay();
+    }
+}
+function updateProgressDisplay() {
     const totalProgress = Object.values(progress).reduce((a, b) => a + b, 0) / Object.keys(progress).length;
-    document.getElementById('learningProgress').style.width = `${totalProgress}%`;
-    document.getElementById('progressText').textContent = `${Math.round(totalProgress)}%`;
+    const progressBar = document.getElementById('learningProgress');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressBar && progressText) {
+        progressBar.style.width = `${totalProgress}%`;
+        progressText.textContent = `${Math.round(totalProgress)}%`;
+    }
 }
 
+// Update progress when a section is viewed
+document.querySelectorAll('.material-list li').forEach(item => {
+    item.addEventListener('click', () => {
+        const targetSection = item.dataset.section;
+        if (targetSection) {
+            progress[targetSection] = 100;
+            localStorage.setItem('learningProgress', JSON.stringify(progress));
+            updateProgressDisplay();
+        }
+    });
+});
 
 // Simulasi Hukum Newton I
 const newton1Canvas = document.getElementById('newton1Canvas');
@@ -620,4 +645,75 @@ document.getElementById('checkAnswer').addEventListener('click', () => {
         feedback.textContent = 'Jawaban kurang tepat. Coba lagi!';
         feedback.className = 'incorrect';
     }
+    // Toggle Sidebar
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.querySelector('.material-sidebar');
+        const content = document.querySelector('.material-content');
+        const sidebarToggle = document.createElement('button');
+        
+        sidebarToggle.className = 'sidebar-toggle';
+        sidebarToggle.innerHTML = '←';
+        document.body.appendChild(sidebarToggle);
+        
+        let isCollapsed = false;
+        
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+            sidebar.classList.toggle('collapsed');
+            content.classList.toggle('expanded');
+            sidebarToggle.innerHTML = isCollapsed ? '→' : '←';
+            
+            if (isCollapsed) {
+                sidebar.style.transform = 'translateX(-100%)';
+                content.style.marginLeft = '0';
+                sidebarToggle.style.left = '10px';
+            } else {
+                sidebar.style.transform = 'translateX(0)';
+                content.style.marginLeft = 'var(--sidebar-width)';
+                sidebarToggle.style.left = 'calc(var(--sidebar-width) - 15px)';
+            }
+        }
+        
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        
+        // Initialize progress
+        loadProgress();
+    });
+
+// Fix Video Size
+document.querySelectorAll('.video-container video').forEach(video => {
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.objectFit = 'contain';
+});
+
+// Fix Button Styles
+document.querySelectorAll('button').forEach(button => {
+    button.classList.add('btn');
+});
+document.addEventListener('DOMContentLoaded', function() {
+    // Create sidebar toggle button
+    const sidebarToggle = document.createElement('button');
+    sidebarToggle.className = 'sidebar-toggle';
+    sidebarToggle.innerHTML = '←';
+    document.body.appendChild(sidebarToggle);
+
+    const sidebar = document.querySelector('.material-sidebar');
+    const content = document.querySelector('.material-content');
+    let isCollapsed = false;
+
+    sidebarToggle.addEventListener('click', function() {
+        isCollapsed = !isCollapsed;
+        sidebar.classList.toggle('collapsed');
+        content.classList.toggle('expanded');
+        sidebarToggle.innerHTML = isCollapsed ? '→' : '←';
+        sidebarToggle.style.left = isCollapsed ? '20px' : 'calc(var(--sidebar-width) - 15px)';
+    });
+
+    // Fix progress text
+    const progressText = document.getElementById('progressText');
+    if (progressText && progressText.textContent === 'NaN%') {
+        progressText.textContent = '0%';
+    }
+});
 });

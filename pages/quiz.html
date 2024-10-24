@@ -14,7 +14,6 @@
             <div class="nav-container">
                 <nav>
                     <a href="../index.html" class="nav-brand">
-                        
                         MyPhysicsLab
                     </a>
                     
@@ -33,16 +32,17 @@
             </div>
         </nav>
     </header>
-
+   
     <main>
         <section class="quiz-container">
             <header class="quiz-header">
                 <h1>Kuis Fisika</h1>
                 <div class="quiz-info">
-                    <p>Jumlah Soal: <span id="totalQuestions">10</span></p>
+                    <p>Jumlah Soal: <span id="totalQuestions">15</span></p>
                     <p>Waktu: <span id="timer">30:00</span></p>
                     <p>Skor: <span id="score">0</span></p>
                 </div>
+                
             </header>
 
             <section class="quiz-content" id="quizContent">
@@ -53,9 +53,9 @@
                     <div class="instructions">
                         <h3>Petunjuk:</h3>
                         <ul>
-                            <li>Kuis terdiri dari 5 soal dalam bentuk pilihan ganda dan 5 soal menyusun konsep</li>
+                            <li>Kuis terdiri dari 5 soal dalam bentuk pilihan ganda, 5 soal menyusun konsep, dan 5 soal isian singkat</li>
                             <li>Waktu pengerjaan 30 menit</li>
-                            <li>Tidak ada pengurangan nilai untuk jawaban salah</li>
+                            <li>Baca pertanyaan dengan seksama</li>
                             <li>Pastikan koneksi internet stabil</li>
                         </ul>
                     </div>
@@ -65,6 +65,7 @@
                 <!-- Question Screen -->
                 <div class="question-screen hidden" id="questionScreen">
                     <div class="question-container">
+                        <h2>Bagian 1: Plihan Ganda</h2>
                         <div class="question-number">Soal <span id="currentNumber">1</span>/10</div>
                         <div class="question-text" id="questionText"></div>
                         <form class="options-container" id="optionsForm">
@@ -87,7 +88,7 @@
                 <!-- Drag & Drop Screen -->
                 <div class="drag-drop-screen hidden" id="dragDropScreen">
                     <div class="drag-drop-header">
-                        <h2>Bagian 2: Menyusun Konsep</h2>
+                        <h2>Bagian 2: Menyusun Urutan Jawaban</h2>
                         <div class="question-number">Soal <span id="currentDragDrop">1</span>/5</div>
                     </div>
 
@@ -116,7 +117,45 @@
                         </div>
                     </div>
                 </div>
+                <div id="confirmationModal" class="modal hidden">
+                    <div class="modal-content">
+                        <h3>Konfirmasi Selesai</h3>
+                        <p>Apakah Anda yakin ingin mengakhiri kuis?</p>
+                        <div class="modal-buttons">
+                            <button id="cancelSubmit" class="btn-secondary">Batal</button>
+                            <button id="confirmSubmit" class="btn-primary">Ya, Selesai</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Short Answer Screen -->
+                <div class="short-answer-screen hidden" id="shortAnswerScreen">
+                <div class="short-answer-header">
+                    <h2>Bagian 3: Isian Singkat</h2>
+                    <div class="question-number">Soal <span id="currentShortAnswer">1</span>/5</div>
+                </div>
 
+                <div class="short-answer-container">
+                    <div class="question-text" id="shortAnswerQuestion"></div>
+                    
+                    <div class="answer-input-container">
+                        <input type="number" id="shortAnswerInput" placeholder="Masukkan jawaban Anda">
+                        <p class="input-hint">*Masukkan angka saja tanpa satuan</p>
+                    </div>
+
+                    <div class="explanation hidden" id="shortAnswerExplanation"></div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button id="prevShortAnswer" class="btn-secondary">Sebelumnya</button>
+                    <button id="nextShortAnswer" class="btn-primary">Selanjutnya</button>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress" id="shortAnswerProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
                 <!-- Result Screen -->
                 <div class="result-screen hidden" id="resultScreen">
                     <h2>Hasil Kuis</h2>
@@ -131,7 +170,7 @@
                     <div class="answer-review">
                         <h3>Rangkuman Jawaban</h3>
                         <div class="review-container" id="reviewContainer">
-                            <!-- diisi JavaScript -->
+                            <!-- pake JavaScript -->
                         </div>
                     </div>
 
@@ -146,6 +185,10 @@
                 Status Koneksi: <span id="connectionStatus">Menghubungkan...</span>
             </div>
         </section>
+        <!-- Status Koneksi untuk Kuis -->
+        <div class="connection-status" id="quizConnectionStatus">
+        Status Koneksi: <span>Tidak Terhubung</span>
+        </div>
     </main>
 
     <footer>
@@ -168,17 +211,6 @@
             <p>&copy; 2024 MyPhysicsLab. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
-
-    <div id="confirmationModal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Konfirmasi Selesai</h3>
-            <p>Apakah Anda yakin ingin mengakhiri kuis?</p>
-            <div class="modal-buttons">
-                <button id="cancelSubmit" class="btn-secondary">Batal</button>
-                <button id="confirmSubmit" class="btn-primary">Ya, Selesai</button>
-            </div>
-        </div>
-    </div>
 
     <script src="../js/quiz.js"></script>
 </body>

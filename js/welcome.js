@@ -10,6 +10,11 @@ ws.onclose = () => {
     document.getElementById('connectionStatus').textContent = 'Terputus';
     document.getElementById('connectionStatus').style.color = '#f44336';
 };
+ws.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+    document.getElementById('connectionStatus').textContent = 'Error';
+    document.getElementById('connectionStatus').style.color = '#f44336';
+};
 
 // Drag and Drop Functionality
 document.querySelectorAll('.card').forEach(card => {

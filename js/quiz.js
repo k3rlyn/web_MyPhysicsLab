@@ -148,6 +148,37 @@ const dragDropData = [
     explanation: "Langkah-langkah untuk menghitung percepatan dimulai dengan menghitung gaya listrik menggunakan I × V, lalu memasukkan hasilnya ke dalam rumus percepatan a = F / m."
     }
 ];
+// isian singkat
+const shortAnswerData = [
+    {
+        question: "Sebuah benda memiliki massa 2 kg dan diberi gaya 10 N. Berapakah percepatannya? (Jawab dalam m/s² dengan angka saja)",
+        correctAnswer: "5",
+        explanation: "Menggunakan rumus F = m × a, maka a = F/m = 10/2 = 5 m/s²"
+    },
+    {
+        question: "Jika tegangan listrik 9V dan hambatan 3Ω, berapakah arus listriknya? (Jawab dalam Ampere dengan angka saja)",
+        correctAnswer: "3",
+        explanation: "Menggunakan Hukum Ohm: I = V/R = 9/3 = 3 A"
+    },
+    {
+        question: "Sebuah mobil bermassa 1000 kg mengalami percepatan 2 m/s². Berapakah gaya total yang bekerja padanya? (Jawab dalam Newton dengan angka saja)",
+        correctAnswer: "2000",
+        explanation: "Menggunakan Hukum Newton II: F = m × a = 1000 × 2 = 2000 N"
+    },
+    {
+        question: "Jika gaya aksi sebesar 50 N, berapakah gaya reaksi yang terjadi? (Jawab dalam Newton dengan angka saja)",
+        correctAnswer: "50",
+        explanation: "Menurut Hukum Newton III, gaya aksi = gaya reaksi"
+    },
+    {
+        question: "Sebuah rangkaian memiliki arus 2A dan hambatan 6Ω. Berapakah tegangannya? (Jawab dalam Volt dengan angka saja)",
+        correctAnswer: "12",
+        explanation: "Menggunakan Hukum Ohm: V = I × R = 2 × 6 = 12 V"
+    }
+];
+
+// State untuk isian singkat
+let shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
 
 // Quiz State
 let currentQuestion = 0;
@@ -175,14 +206,14 @@ const dragDropScreen = document.getElementById('dragDropScreen');
 // Initialize Quiz
 function initQuiz() {
     document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
-    document.getElementById('prevQuestion').addEventListener('click', prevQuestion);
-    document.getElementById('reviewAnswers').addEventListener('click', showReview);
-    document.getElementById('retakeQuiz').addEventListener('click', resetQuiz);
-    document.getElementById('confirmSubmit').addEventListener('click', submitQuiz);
-    document.getElementById('cancelSubmit').addEventListener('click', () => {
-        confirmationModal.classList.add('hidden');
+    document.getElementById('nextQuestion').addEventListener('click', () => {
+        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+        if (selectedAnswer) {
+            answers[currentQuestion] = parseInt(selectedAnswer.value);
+        }
+        nextQuestion();
     });
+    document.getElementById('prevQuestion').addEventListener('click', prevQuestion);
 }
 
 // Initialize Drag & Drop
@@ -199,13 +230,13 @@ function initDragDrop() {
 
 // Start Quiz
 function startQuiz() {
-    quizStarted = true;
-    startScreen.classList.add('hidden');
-    questionScreen.classList.remove('hidden');
-    startTimer();
-    showQuestion(0);
+    currentQuestion = 0; // Reset ke pertanyaan pertama
+    answers = new Array(quizData.length).fill(null); // Reset jawaban
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('questionScreen').classList.remove('hidden');
+    showQuestion(0); // Mulai dari pertanyaan pertama
+    startTimer(); // Mulai timer
 }
-
 // Start Drag & Drop Section
 function startDragDrop() {
     questionScreen.classList.add('hidden');
@@ -215,14 +246,24 @@ function startDragDrop() {
 
 // Show Question
 function showQuestion(index) {
-    const question = quizData[index];
     currentQuestion = index;
+    const question = quizData[index];
     
-    currentNumberSpan.textContent = index + 1;
-    quizProgress.style.width = `${((index + 1) / quizData.length) * 100}%`;
-    questionText.textContent = question.question;
+    // Update nomor pertanyaan dengan benar
+    document.getElementById('currentNumber').textContent = index + 1;
     
+    // Update progress bar
+    const progress = ((index + 1) / quizData.length) * 100;
+    document.getElementById('quizProgress').style.width = `${progress}%`;
+    
+    // Update pertanyaan
+    document.getElementById('questionText').textContent = question.question;
+    
+    // Bersihkan opsi sebelumnya
+    const optionsForm = document.getElementById('optionsForm');
     optionsForm.innerHTML = '';
+    
+    // Buat opsi jawaban
     question.options.forEach((option, i) => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option-item';
@@ -232,6 +273,8 @@ function showQuestion(index) {
         input.id = `option${i}`;
         input.name = 'answer';
         input.value = i;
+        
+        // Check jika sudah ada jawaban sebelumnya
         if (answers[currentQuestion] === i) {
             input.checked = true;
         }
@@ -243,11 +286,6 @@ function showQuestion(index) {
         optionDiv.appendChild(input);
         optionDiv.appendChild(label);
         optionsForm.appendChild(optionDiv);
-        
-        input.addEventListener('change', () => {
-            answers[currentQuestion] = i;
-            updateNavigation();
-        });
     });
     
     updateNavigation();
@@ -447,10 +485,15 @@ function updateDragDropNavigation() {
 
 // Timer Functions
 function startTimer() {
+    timeLeft = 1800; // Reset timer ke 30 menit
     timer = setInterval(() => {
-        timeLeft--;
-        updateTimerDisplay();
-        if (timeLeft <= 0) {
+        if (timeLeft > 0) {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        } else {
             clearInterval(timer);
             submitQuiz();
         }
@@ -603,4 +646,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initQuiz();
     initDragDrop();
 
-});
+}
+
+);
+
+// WebSocket Connection for Quiz Page
+const quizWs = new WebSocket('wss://echo.websocket.org');
+
+// When the WebSocket connection is opened
+quizWs.onopen = () => {
+    document.getElementById('quizConnectionStatus').textContent = 'Terhubung';
+    document.getElementById('quizConnectionStatus').style.color = '#4CAF50';
+};
+
+// When the WebSocket connection is closed
+quizWs.onclose = () => {
+    document.getElementById('quizConnectionStatus').textContent = 'Terputus';
+    document.getElementById('quizConnectionStatus').style.color = '#f44336';
+};
+
+// When there is an error with the WebSocket connection
+quizWs.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+    document.getElementById('quizConnectionStatus').textContent = 'Error';
+    document.getElementById('quizConnectionStatus').style.color = '#f44336';
+};
+

@@ -6,6 +6,7 @@
     --text-color: #333;
     --background-color: #f5f7fa; 
     --white: #ffffff;
+    --gradient-bg: linear-gradient(135deg, #1e3c72 0%, #4776c9 100%);
 }
 
 * {
@@ -23,7 +24,7 @@ body {
 
 /* Navigation */
 nav {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--gradient-bg);
     padding: 1rem;
     display: flex;
     justify-content: space-between;
@@ -35,7 +36,7 @@ nav {
 }
 
 .nav-brand {
-    color: var(--white);
+    color: white;
     font-size: 1.5rem;
     font-weight: bold;
 }
@@ -46,7 +47,7 @@ nav {
 }
 
 .nav-links a {
-    color: var(--white);
+    color: white;
     text-decoration: none;
     padding: 0.5rem 1rem;
     border-radius: 25px;
@@ -211,48 +212,53 @@ nav {
 
 /* Footer */
 footer {
-    background: var(--primary-color);
-    color: var(--white);
-    padding: 4rem 2rem 2rem;
+    background: var(--gradient-bg);
+    color: white;
+    padding: 4rem 2rem;
+    margin-top: 4rem;
+    font-size: 1.2 rem;
 }
 
 .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    text-align: center;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
 }
 
 .footer-section h4 {
-    margin-bottom: 1rem;
+    margin-bottom: 1.1rem;
+    font-size: 1.3rem;
 }
 
 .footer-section ul {
     list-style: none;
+    padding: 0;
 }
 
 .footer-section ul li {
     margin-bottom: 0.5rem;
 }
 
-.footer-section a {
-    color: var(--white);
+.footer-section ul li a {
+    color: white;
     text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
 }
 
+.footer-section ul li a:hover {
+    opacity: 1;
+}
 .footer-bottom {
     text-align: center;
-    margin-top: 2rem;
     padding-top: 2rem;
+    margin-top: 2rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 2rem; 
+    font-size: 1rem;  
 }
-
 /* Animations */
 @keyframes fadeInUp {
     from {

@@ -272,5 +272,29 @@
     </footer>
 
     <script src="../js/materials.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.createElement('button');
+            sidebarToggle.className = 'sidebar-toggle';
+            sidebarToggle.innerHTML = '←';
+            document.body.appendChild(sidebarToggle);
+        
+            const sidebar = document.querySelector('.material-sidebar');
+            const content = document.querySelector('.material-content');
+            let isCollapsed = false;
+        
+            sidebarToggle.addEventListener('click', function() {
+                isCollapsed = !isCollapsed;
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('expanded');
+                sidebarToggle.innerHTML = isCollapsed ? '→' : '←';
+                
+                sidebarToggle.style.left = isCollapsed ? '10px' : '280px';
+            });
+        });
+        </script>
+        </body>
+        </html>
 </body>
 </html>
