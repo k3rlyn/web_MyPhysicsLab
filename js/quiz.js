@@ -110,7 +110,6 @@ const dragDropData = [
         "Gaya (F) = 10kg × 2m/s²",
         "Gaya (F) = ?",
         "Gunakan rumus F = m × a",
-        "Gaya (F) = ?",
         "Hasil gaya (F) = 20N"
     ],
     correctOrder: [0, 1, 3, 4, 2, 5],
@@ -177,18 +176,20 @@ const shortAnswerData = [
     }
 ];
 
-// State untuk isian singkat
-let shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
 
 // Quiz State
 let currentQuestion = 0;
 let currentDragDropQuestion = 0;
+let currentShortAnswer = 0;
 let score = 0;
 let timer;
-let timeLeft = 1800; // 30 menit = 1800 detik
+let timeLeft = 1800;
 let answers = new Array(quizData.length).fill(null);
 let dragDropAnswers = new Array(dragDropData.length).fill(null);
-let quizStarted = false;
+let shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
+
+// Tambahkan referensi DOM untuk short answer screen
+const shortAnswerScreen = document.getElementById('shortAnswerScreen');
 
 // DOM Elements
 const startScreen = document.getElementById('startScreen');
@@ -205,90 +206,41 @@ const dragDropScreen = document.getElementById('dragDropScreen');
 
 // Initialize Quiz
 function initQuiz() {
-    document.getElementById('startQuiz').addEventListener('click', startQuiz);
-    document.getElementById('nextQuestion').addEventListener('click', () => {
-        const selectedAnswer = document.querySelector('input[name="answer"]:checked');
-        if (selectedAnswer) {
-            answers[currentQuestion] = parseInt(selectedAnswer.value);
-        }
-        nextQuestion();
+    // Reset state
+    currentQuestion = 0;
+    currentDragDropQuestion = 0;
+    currentShortAnswer = 0;
+    answers = new Array(quizData.length).fill(null);
+    dragDropAnswers = new Array(dragDropData.length).fill(null);
+    shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
+    
+    // Start Quiz Button
+    document.getElementById('startQuiz').addEventListener('click', () => {
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('questionScreen').classList.remove('hidden');
+        showQuestion(0);
+        startTimer();
     });
+
+    // Navigation Buttons
+    document.getElementById('nextQuestion').addEventListener('click', nextQuestion);
     document.getElementById('prevQuestion').addEventListener('click', prevQuestion);
-}
-
-// Initialize Drag & Drop
-function initDragDrop() {
-    document.getElementById('nextQuestion').addEventListener('click', () => {
-        if (currentQuestion === quizData.length - 1) {
-            startDragDrop();
-        }
-    });
-
-    document.getElementById('prevDragDrop').addEventListener('click', prevDragDropQuestion);
+    
+    // Drag & Drop Navigation
     document.getElementById('nextDragDrop').addEventListener('click', nextDragDropQuestion);
-}
-
-// Start Quiz
-function startQuiz() {
-    currentQuestion = 0; // Reset ke pertanyaan pertama
-    answers = new Array(quizData.length).fill(null); // Reset jawaban
-    document.getElementById('startScreen').classList.add('hidden');
-    document.getElementById('questionScreen').classList.remove('hidden');
-    showQuestion(0); // Mulai dari pertanyaan pertama
-    startTimer(); // Mulai timer
-}
-// Start Drag & Drop Section
-function startDragDrop() {
-    questionScreen.classList.add('hidden');
-    dragDropScreen.classList.remove('hidden');
-    showDragDropQuestion(0);
-}
-
-// Show Question
-function showQuestion(index) {
-    currentQuestion = index;
-    const question = quizData[index];
+    document.getElementById('prevDragDrop').addEventListener('click', prevDragDropQuestion);
     
-    // Update nomor pertanyaan dengan benar
-    document.getElementById('currentNumber').textContent = index + 1;
+    // Short Answer Navigation
+    document.getElementById('nextShortAnswer').addEventListener('click', nextShortAnswer);
+    document.getElementById('prevShortAnswer').addEventListener('click', prevShortAnswer);
     
-    // Update progress bar
-    const progress = ((index + 1) / quizData.length) * 100;
-    document.getElementById('quizProgress').style.width = `${progress}%`;
-    
-    // Update pertanyaan
-    document.getElementById('questionText').textContent = question.question;
-    
-    // Bersihkan opsi sebelumnya
-    const optionsForm = document.getElementById('optionsForm');
-    optionsForm.innerHTML = '';
-    
-    // Buat opsi jawaban
-    question.options.forEach((option, i) => {
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'option-item';
-        
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.id = `option${i}`;
-        input.name = 'answer';
-        input.value = i;
-        
-        // Check jika sudah ada jawaban sebelumnya
-        if (answers[currentQuestion] === i) {
-            input.checked = true;
-        }
-        
-        const label = document.createElement('label');
-        label.htmlFor = `option${i}`;
-        label.textContent = option;
-        
-        optionDiv.appendChild(input);
-        optionDiv.appendChild(label);
-        optionsForm.appendChild(optionDiv);
+    // Modal & Result Buttons
+    document.getElementById('confirmSubmit').addEventListener('click', submitQuiz);
+    document.getElementById('cancelSubmit').addEventListener('click', () => {
+        document.getElementById('confirmationModal').classList.add('hidden');
     });
-    
-    updateNavigation();
+    document.getElementById('reviewAnswers').addEventListener('click', showReview);
+    document.getElementById('retakeQuiz').addEventListener('click', resetQuiz);
 }
 
 // Show Drag & Drop Question
@@ -296,15 +248,21 @@ function showDragDropQuestion(index) {
     currentDragDropQuestion = index;
     const question = dragDropData[index];
     
-    document.getElementById('currentDragDrop').textContent = index + 1;
-    document.getElementById('dragDropProgress').style.width = `${((index + 1) / dragDropData.length) * 100}%`;
+    // Update nomor soal dan progress
+    document.getElementById('currentDragDrop').textContent = `${index + 1}/5`;
+    document.getElementById('dragDropProgress').style.width = 
+        `${((index + 1) / dragDropData.length) * 100}%`;
+    
+    // Update teks pertanyaan
     document.getElementById('dragDropQuestion').textContent = question.question;
     
+    // Setup drag items dan drop zones
     const dragItems = document.getElementById('dragItems');
     const dropZones = document.getElementById('dropZones');
     dragItems.innerHTML = '';
     dropZones.innerHTML = '';
     
+    // Buat drag items
     question.items.forEach((item, i) => {
         const itemElement = document.createElement('div');
         itemElement.className = 'draggable-item';
@@ -314,17 +272,15 @@ function showDragDropQuestion(index) {
         
         itemElement.addEventListener('dragstart', handleDragStart);
         itemElement.addEventListener('dragend', handleDragEnd);
-        
         dragItems.appendChild(itemElement);
     });
     
-    question.correctOrder.forEach((_, i) => {
+    // Buat drop zones
+    for (let i = 0; i < question.correctOrder.length; i++) {
         const dropZone = document.createElement('div');
         dropZone.className = 'drop-zone';
-        dropZone.innerHTML = `
-            
-            <span>Letakkan item di sini</span>
-        `;
+        dropZone.dataset.position = i;
+        dropZone.innerHTML = '<span>Letakkan item di sini</span>';
         
         dropZone.addEventListener('dragover', handleDragOver);
         dropZone.addEventListener('drop', handleDrop);
@@ -332,10 +288,86 @@ function showDragDropQuestion(index) {
         dropZone.addEventListener('dragleave', handleDragLeave);
         
         dropZones.appendChild(dropZone);
-    });
+    }
     
+    // Sembunyikan penjelasan
     document.getElementById('dragDropExplanation').classList.add('hidden');
     updateDragDropNavigation();
+}
+
+function showShortAnswerQuestion(index) {
+    currentShortAnswer = index;
+    const question = shortAnswerData[index];
+    
+    // Update nomor soal dan progress
+    document.getElementById('currentShortAnswer').textContent = `${index + 1}/5`;
+    document.getElementById('shortAnswerProgress').style.width = 
+        `${((index + 1) / shortAnswerData.length) * 100}%`;
+    
+    // Update teks pertanyaan
+    document.getElementById('shortAnswerQuestion').textContent = question.question;
+    
+    // Reset atau isi input jawaban
+    const input = document.getElementById('shortAnswerInput');
+    input.value = shortAnswerAnswers[index] || '';
+    
+    // Sembunyikan penjelasan
+    document.getElementById('shortAnswerExplanation').classList.add('hidden');
+    updateShortAnswerNavigation();
+}
+
+// Fungsi Navigasi dan State
+function updateNavigation() {
+    const prevButton = document.getElementById('prevQuestion');
+    const nextButton = document.getElementById('nextQuestion');
+    
+    prevButton.disabled = currentQuestion === 0;
+    if (currentQuestion === quizData.length - 1) {
+        nextButton.textContent = 'Selesai';
+    } else {
+        nextButton.textContent = 'Selanjutnya';
+    }
+}
+
+function updateDragDropNavigation() {
+    const prevButton = document.getElementById('prevDragDrop');
+    const nextButton = document.getElementById('nextDragDrop');
+    
+    prevButton.disabled = false;
+    nextButton.textContent = currentDragDropQuestion === dragDropData.length - 1 ? 'Selesai' : 'Selanjutnya';
+}
+
+function updateShortAnswerNavigation() {
+    const prevButton = document.getElementById('prevShortAnswer');
+    const nextButton = document.getElementById('nextShortAnswer');
+    
+    prevButton.disabled = false;
+    nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 'Selesai' : 'Selanjutnya';
+}
+
+function startDragDrop() {
+    questionScreen.classList.add('hidden');
+    dragDropScreen.classList.remove('hidden');
+    currentDragDropQuestion = 0;
+    showDragDropQuestion(0);
+}
+
+function startShortAnswer() {
+    dragDropScreen.classList.add('hidden');
+    shortAnswerScreen.classList.remove('hidden');
+    currentShortAnswer = 0;
+    showShortAnswerQuestion(0);
+}
+
+// Fungsi Transisi
+function nextSection() {
+    if (currentQuestion === quizData.length - 1) {
+        startDragDrop();
+    } else if (currentDragDropQuestion === dragDropData.length - 1) {
+        startShortAnswer();
+    } else if (currentShortAnswer === shortAnswerData.length - 1) {
+        submitQuiz();
+    }
 }
 
 // Drag & Drop Event Handlers
@@ -365,6 +397,7 @@ function handleDragLeave(e) {
     }
 }
 
+
 function handleDrop(e) {
     e.preventDefault();
     const dropZone = e.target.closest('.drop-zone');
@@ -376,29 +409,24 @@ function handleDrop(e) {
     
     if (!draggedItem) return;
     
-    // Cek apakah dropZone sudah berisi item
+    // Handle existing item in drop zone
     const existingItem = dropZone.querySelector('.draggable-item');
     if (existingItem) {
-        // Kembalikan item yang ada sebelumnya ke container asal
         const clonedExisting = existingItem.cloneNode(true);
         clonedExisting.classList.remove('dropped');
         document.getElementById('dragItems').appendChild(clonedExisting);
-        
-        // Tambahkan kembali event listeners
         clonedExisting.addEventListener('dragstart', handleDragStart);
         clonedExisting.addEventListener('dragend', handleDragEnd);
     }
     
-    // Bersihkan dropZone dan tambahkan item baru
+    // Place new item
     dropZone.innerHTML = '';
     const clonedItem = draggedItem.cloneNode(true);
     clonedItem.classList.add('dropped');
     dropZone.appendChild(clonedItem);
-    dropZone.classList.add('filled');
-    
-    // Hapus item yang di-drag dari container asalnya
     draggedItem.remove();
     
+    dropZone.classList.add('filled');
     checkDragDropAnswer();
 }
 
@@ -417,36 +445,181 @@ function checkDragDropAnswer() {
             (index, i) => index === currentQuestion.correctOrder[i]
         );
         
-        const explanation = document.getElementById('dragDropExplanation');
-        explanation.classList.remove('hidden');
-        explanation.innerHTML = `
-            <p class="explanation">${currentQuestion.explanation}</p>
-        `;
-        
         dragDropAnswers[currentDragDropQuestion] = isCorrect;
-
-        // Langsung lanjut ke soal berikutnya setelah menjawab
-        if (currentDragDropQuestion < dragDropData.length - 1) {
-            setTimeout(() => {
-                showDragDropQuestion(currentDragDropQuestion + 1);
-            }, 1000); // Tunggu 1 detik sebelum lanjut ke soal berikutnya
-        } else {
-            setTimeout(submitQuiz, 1000); // Jika sudah soal terakhir, submit quiz
-        }
+        showDragDropExplanation(isCorrect, currentQuestion.explanation);
     }
 }
-// Navigation Functions
+function showDragDropExplanation(isCorrect, explanation) {
+    const explanationDiv = document.getElementById('dragDropExplanation');
+    explanationDiv.classList.remove('hidden');
+    explanationDiv.innerHTML = `
+        <div class="explanation ${isCorrect ? 'correct' : 'incorrect'}">
+            <p><strong>${isCorrect ? 'Benar!' : 'Kurang tepat.'}</strong></p>
+            <p>${explanation}</p>
+        </div>
+    `;
+}
+function calculateScore() {
+    // Multiple choice score
+    const mcScore = answers.reduce((total, answer, index) => {
+        return total + (answer === quizData[index].correct ? 1 : 0);
+    }, 0);
+    
+    // Drag & drop score
+    const ddScore = dragDropAnswers.reduce((total, isCorrect) => {
+        return total + (isCorrect ? 1 : 0);
+    }, 0);
+    
+    // Short answer score
+    const saScore = shortAnswerAnswers.reduce((total, answer, index) => {
+        return total + (answer === shortAnswerData[index].correctAnswer ? 1 : 0);
+    }, 0);
+    
+    const totalQuestions = quizData.length + dragDropData.length + shortAnswerData.length;
+    const totalScore = mcScore + ddScore + saScore;
+    
+    return (totalScore / totalQuestions) * 100;
+}
+
+function showResults() {
+    clearInterval(timer);
+    
+    // Hide all sections
+    questionScreen.classList.add('hidden');
+    dragDropScreen.classList.add('hidden');
+    shortAnswerScreen.classList.add('hidden');
+    
+    // Show results
+    resultScreen.classList.remove('hidden');
+    
+    const percentage = calculateScore();
+    document.getElementById('finalScore').textContent = `${Math.round(percentage)}%`;
+    
+    // Draw score circle
+    const canvas = document.getElementById('scoreCanvas');
+    const ctx = canvas.getContext('2d');
+    drawScoreCircle(ctx, percentage);
+}
+
+function drawScoreCircle(ctx, percentage) {
+    const centerX = 100;
+    const centerY = 100;
+    const radius = 80;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, 200, 200);
+    
+    // Draw background circle
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#eee';
+    ctx.lineWidth = 15;
+    ctx.stroke();
+    
+    // Draw score arc
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, -Math.PI/2, (-Math.PI/2) + (percentage/100) * 2 * Math.PI);
+    ctx.strokeStyle = percentage >= 60 ? '#4CAF50' : '#f44336';
+    ctx.lineWidth = 15;
+    ctx.stroke();
+    
+    // Draw percentage text
+    ctx.font = 'bold 30px Arial';
+    ctx.fillStyle = '#333';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${Math.round(percentage)}%`, centerX, centerY);
+}
+// Fungsi untuk memastikan jawaban terpilih
+function saveCurrentAnswer() {
+    const selectedAnswer = document.querySelector('input[name="answer"]:checked');
+    if (selectedAnswer) {
+        answers[currentQuestion] = parseInt(selectedAnswer.value);
+        return true;
+    }
+    return false;
+}
+
+// Fungsi navigasi yang diperbaiki
 function nextQuestion() {
-    if (currentQuestion < quizData.length - 1) {
-        showQuestion(currentQuestion + 1);
+    if (saveCurrentAnswer()) {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+            showQuestion(currentQuestion);
+        } else {
+            startDragDrop();
+        }
     } else {
-        confirmSubmit();
+        alert('Silakan pilih jawaban terlebih dahulu');
     }
 }
 
 function prevQuestion() {
     if (currentQuestion > 0) {
-        showQuestion(currentQuestion - 1);
+        currentQuestion--;
+        showQuestion(currentQuestion);
+    }
+}
+
+// Fungsi untuk menampilkan soal
+function showQuestion(index) {
+    currentQuestion = index;
+    const question = quizData[index];
+    
+    document.getElementById('currentNumber').textContent = `${index + 1}/5`;
+    document.getElementById('questionText').textContent = question.question;
+    
+    const optionsForm = document.getElementById('optionsForm');
+    optionsForm.innerHTML = '';
+    
+    question.options.forEach((option, i) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option-item';
+        
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.id = `option${i}`;
+        input.name = 'answer';
+        input.value = i;
+        
+        const label = document.createElement('label');
+        label.htmlFor = `option${i}`;
+        label.textContent = option;
+        
+        if (answers[currentQuestion] === i) {
+            input.checked = true;
+        }
+        
+        optionDiv.appendChild(input);
+        optionDiv.appendChild(label);
+        optionsForm.appendChild(optionDiv);
+    });
+    
+    // Update progress bar
+    const progress = ((index + 1) / quizData.length) * 100;
+    document.getElementById('quizProgress').style.width = `${progress}%`;
+    
+    updateNavigation();
+}
+
+// Navigation Functions
+function nextQuestion() {
+    if (saveCurrentAnswer()) {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+            showQuestion(currentQuestion);
+        } else {
+            startDragDrop();
+        }
+    } else {
+        alert('Silakan pilih jawaban terlebih dahulu');
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        showQuestion(currentQuestion);
     }
 }
 
@@ -485,25 +658,29 @@ function updateDragDropNavigation() {
 
 // Timer Functions
 function startTimer() {
-    timeLeft = 1800; // Reset timer ke 30 menit
+    timeLeft = 1800; // 30 menit
+    clearInterval(timer);
+    
     timer = setInterval(() => {
         if (timeLeft > 0) {
             timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            document.getElementById('timer').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            updateTimerDisplay();
         } else {
             clearInterval(timer);
             submitQuiz();
         }
-    }, 1000);
+    }, 1000); // Interval diatur ke 1000ms (1 detik)
+
+    updateTimerDisplay(); // Update display awal
 }
 
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
-    timerSpan.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) {
+        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
 }
 
 // Submit and Results
@@ -513,13 +690,22 @@ function confirmSubmit() {
 
 function submitQuiz() {
     clearInterval(timer);
-    // Tutup WebSocket
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close();
-    }
-    calculateScore();
     showResults();
-    confirmationModal.classList.add('hidden');
+    }
+
+    // Reset Quiz
+function resetQuiz() {
+    currentQuestion = 0;
+    currentDragDropQuestion = 0;
+    currentShortAnswer = 0;
+    answers = new Array(quizData.length).fill(null);
+    dragDropAnswers = new Array(dragDropData.length).fill(null);
+    shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
+    
+    resultScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+    
+    updateTimerDisplay();
 }
 
 function calculateScore() {
@@ -644,7 +830,7 @@ function resetQuiz() {
 // Initialize quiz when page loads
 document.addEventListener('DOMContentLoaded', () => {
     initQuiz();
-    initDragDrop();
+  
 
 }
 
