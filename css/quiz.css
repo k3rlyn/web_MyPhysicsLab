@@ -75,6 +75,7 @@ nav {
 }
 
 .nav-links {
+    color: white;
     display: flex;
     gap: 2rem;
     list-style: none;
@@ -94,8 +95,8 @@ nav {
     
 }
 
-.nav-links a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.nav-links a:hover, .nav-links a.active {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Main Quiz Container */
@@ -337,7 +338,7 @@ main {
 .options-container {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1.5rem;
 }
 
 .option-item {
@@ -371,6 +372,13 @@ main {
     position: relative;
     overflow: hidden;
     margin-bottom: 1rem;
+    gap: 1rem;
+}
+.option-item input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0; /* Mencegah radio button menyusut */
 }
 
 .option-item:hover {
@@ -412,6 +420,15 @@ input[type="radio"] {
     width: 20px;
     height: 20px;
     cursor: pointer;
+}
+.option-item label {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    cursor: pointer;
+    flex: 1; /* Label mengambil sisa ruang */
+    display: flex;
+    align-items: center;
 }
 
 /* Progress Bar */
@@ -686,25 +703,6 @@ footer {
     color: white;
 }
 
-/* Cancel Button */
-.btn-cancel {
-    background: white;
-    color: #E74C3C;
-    border: 2px solid #E74C3C;
-}
-
-/* Confirmation Buttons */
-.btn-confirm {
-    background: linear-gradient(135deg, #2ECC71 0%, #26A65B 100%);
-    color: white;
-}
-
-.btn-cancel-modal {
-    background: white;
-    color: #E74C3C;
-    border: 2px solid #E74C3C;
-}
-
 /* Hover Effects */
 .btn-primary:hover,
 .btn-next:hover,
@@ -880,17 +878,43 @@ button:disabled {
 
 /* Explanation Section */
 .explanation {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     padding: 1.5rem;
     background: #f0f7ff;
     border-left: 4px solid #4776E6;
     border-radius: 0 10px 10px 0;
+    border-left: 4px solid;
+    animation: fadeIn 0.3s ease;
 }
 
 .explanation p {
     color: var(--text-color);
     font-size: 1rem;
     line-height: 1.6;
+}
+.explanation.correct {
+    background: #f0fff4;
+    border-left-color: #2ECC71;
+}
+
+.explanation.incorrect {
+    background: #fff5f5;
+    border-left-color: #E74C3C;
+}
+
+.explanation .result-text {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.explanation .explanation-text {
+    color: #4a5568;
+    line-height: 1.6;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive Design */
@@ -914,10 +938,33 @@ button:disabled {
     margin: 2rem 0;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+.review-item {
+    background: #f8faff;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.review-item.correct {
+    border-left-color: #2ECC71;
+}
+
+.review-item.incorrect {
+    border-left-color: #E74C3C;
+}
 
 .answer-input-container {
     margin: 2rem 0;
 }
+
+.user-answer, .correct-answer {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(255,255,255,0.5);
+    border-radius: 4px;
+}
+
 
 #shortAnswerInput {
     width: 100%;

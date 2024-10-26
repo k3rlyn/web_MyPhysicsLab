@@ -234,14 +234,7 @@ function initQuiz() {
     document.getElementById('nextShortAnswer').addEventListener('click', nextShortAnswer);
     document.getElementById('prevShortAnswer').addEventListener('click', prevShortAnswer);
     
-    // Modal & Result Buttons
-    document.getElementById('confirmSubmit').addEventListener('click', submitQuiz);
-    document.getElementById('cancelSubmit').addEventListener('click', () => {
-        document.getElementById('confirmationModal').classList.add('hidden');
-    });
-    document.getElementById('reviewAnswers').addEventListener('click', showReview);
-    document.getElementById('retakeQuiz').addEventListener('click', resetQuiz);
-}
+
 
 // Show Drag & Drop Question
 function showDragDropQuestion(index) {
@@ -301,6 +294,7 @@ function showShortAnswerQuestion(index) {
     
     // Update nomor soal dan progress
     document.getElementById('currentShortAnswer').textContent = `${index + 1}/5`;
+    //document.getElementById('shortAnswerQuestion').textContent = question.question;
     document.getElementById('shortAnswerProgress').style.width = 
         `${((index + 1) / shortAnswerData.length) * 100}%`;
     
@@ -314,6 +308,23 @@ function showShortAnswerQuestion(index) {
     // Sembunyikan penjelasan
     document.getElementById('shortAnswerExplanation').classList.add('hidden');
     updateShortAnswerNavigation();
+
+    // Update navigasi
+    const nextButton = document.getElementById('nextShortAnswer');
+    const prevButton = document.getElementById('prevShortAnswer');
+    
+    if (currentShortAnswer === shortAnswerData.length - 1) {
+        nextButton.textContent = 'Selesai';
+    } else {
+        nextButton.textContent = 'Selanjutnya';
+    }
+
+    // Sembunyikan penjelasan untuk soal baru
+    const explanation = document.getElementById('shortAnswerExplanation');
+    if (explanation) {
+        explanation.classList.add('hidden');
+    }
+
 }
 
 // Fungsi Navigasi dan State
@@ -343,6 +354,20 @@ function updateShortAnswerNavigation() {
     
     prevButton.disabled = false;
     nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 'Selesai' : 'Selanjutnya';
+}
+function nextShortAnswer() {
+    const input = document.getElementById('shortAnswerInput');
+    if (input.value.trim()) {
+        shortAnswerAnswers[currentShortAnswer] = input.value.trim();
+        if (currentShortAnswer < shortAnswerData.length - 1) {
+            showShortAnswerQuestion(currentShortAnswer + 1);
+        } else {
+            // Langsung ke hasil tanpa konfirmasi
+            submitQuiz();
+        }
+    } else {
+        alert('Silakan masukkan jawaban Anda');
+    }
 }
 
 function startDragDrop() {
@@ -637,7 +662,9 @@ function nextDragDropQuestion() {
     if (currentDragDropQuestion < dragDropData.length - 1) {
         showDragDropQuestion(currentDragDropQuestion + 1);
     } else {
-        submitQuiz();
+        dragDropScreen.classList.add('hidden');
+        shortAnswerScreen.classList.remove('hidden');
+        showShortAnswerQuestion(0); // Mulai bagian isian singkat
     }
 }
 
@@ -673,7 +700,7 @@ function startTimer() {
 
     updateTimerDisplay(); // Update display awal
 }
-
+}
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -683,29 +710,15 @@ function updateTimerDisplay() {
     }
 }
 
-// Submit and Results
-function confirmSubmit() {
-    confirmationModal.classList.remove('hidden');
-}
-
 function submitQuiz() {
     clearInterval(timer);
+    // Hide all sections
+    questionScreen.classList.add('hidden');
+    dragDropScreen.classList.add('hidden');
+    shortAnswerScreen.classList.add('hidden');
+    // Show results directly
+    resultScreen.classList.remove('hidden');
     showResults();
-    }
-
-    // Reset Quiz
-function resetQuiz() {
-    currentQuestion = 0;
-    currentDragDropQuestion = 0;
-    currentShortAnswer = 0;
-    answers = new Array(quizData.length).fill(null);
-    dragDropAnswers = new Array(dragDropData.length).fill(null);
-    shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
-    
-    resultScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-    
-    updateTimerDisplay();
 }
 
 function calculateScore() {
@@ -813,20 +826,6 @@ function showReview() {
     });
 }
 
-function resetQuiz() {
-    currentQuestion = 0;
-    currentDragDropQuestion = 0;
-    score = 0;
-    timeLeft = 1800;
-    answers = new Array(quizData.length).fill(null);
-    dragDropAnswers = new Array(dragDropData.length).fill(null);
-    
-    resultScreen.classList.add('hidden');
-    dragDropScreen.classList.add('hidden');
-    startScreen.classList.remove('hidden');
-    updateTimerDisplay();
-}
-
 // Initialize quiz when page loads
 document.addEventListener('DOMContentLoaded', () => {
     initQuiz();
@@ -858,3 +857,234 @@ quizWs.onerror = (error) => {
     document.getElementById('quizConnectionStatus').style.color = '#f44336';
 };
 
+function checkShortAnswer() {
+    const input = document.getElementById('shortAnswerInput');
+    const answer = input.value.trim();
+    
+    if (!answer) {
+        alert('Silakan masukkan jawaban Anda');
+        return false;
+    }
+
+    // Simpan jawaban user
+    shortAnswerAnswers[currentShortAnswer] = answer;
+    
+    const currentQuestion = shortAnswerData[currentShortAnswer];
+    const isCorrect = answer === currentQuestion.correctAnswer;
+    const feedback = document.getElementById('shortAnswerFeedback');
+    const nextButton = document.getElementById('nextShortAnswer');
+    
+    // Tampilkan penjelasan
+    const explanation = document.getElementById('shortAnswerExplanation');
+    explanation.classList.remove('hidden');
+    explanation.innerHTML = `
+        <div class="explanation ${isCorrect ? 'correct' : 'incorrect'}">
+            <p class="result-text"><strong>${isCorrect ? 'Benar!' : 'Kurang tepat.'}</strong></p>
+            <p class="user-answer">Jawaban Anda: ${answer}</p>
+            <p class="correct-answer">Jawaban yang benar: ${currentQuestion.correctAnswer}</p>
+            <p class="explanation-text">${currentQuestion.explanation}</p>
+        </div>
+    `;
+    
+    return true;
+
+
+    // Tampilkan feedback
+    feedback.classList.remove('hidden');
+    feedback.innerHTML = `
+        <div class="feedback-box ${isCorrect ? 'correct' : 'incorrect'}">
+            <div class="feedback-header">
+                ${isCorrect ? '✓ Benar!' : '✗ Kurang tepat'}
+            </div>
+            <div class="feedback-explanation">
+                ${currentQuestion.explanation}
+            </div>
+        </div>
+    `;
+    
+    // Update tombol
+    nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 
+        'Selesai' : 'Selanjutnya';
+    
+    // Simpan jawaban
+    shortAnswerAnswers[currentShortAnswer] = answer;
+}
+
+// Update fungsi nextShortAnswer
+function nextShortAnswer() {
+    const input = document.getElementById('shortAnswerInput');
+    if (input.value.trim()) {
+        if (checkShortAnswer()) {
+            setTimeout(() => {
+                if (currentShortAnswer < shortAnswerData.length - 1) {
+                    currentShortAnswer++;
+                    showShortAnswerQuestion(currentShortAnswer);
+                } else {
+                    submitQuiz();
+                }
+            }, 2000); // Tunggu 2 detik agar user bisa membaca penjelasan
+        }
+    } else {
+        alert('Silakan masukkan jawaban Anda');
+    }
+
+    // Event listener untuk tombol next pada isian singkat
+document.getElementById('nextShortAnswer').addEventListener('click', () => {
+    if (document.getElementById('shortAnswerFeedback').classList.contains('hidden')) {
+        // Jika feedback belum ditampilkan, periksa jawaban
+        checkShortAnswer();
+    } else {
+        // Jika feedback sudah ditampilkan, pindah ke soal berikutnya
+        if (currentShortAnswer < shortAnswerData.length - 1) {
+            currentShortAnswer++;
+            showShortAnswerQuestion(currentShortAnswer);
+        } else {
+            submitQuiz();
+        }
+    }
+});
+}
+function resetQuiz() {
+    // Reset semua state
+    currentQuestion = 0;
+    currentDragDropQuestion = 0;
+    currentShortAnswer = 0;
+    score = 0;
+    timeLeft = 1800;
+    answers = new Array(quizData.length).fill(null);
+    dragDropAnswers = new Array(dragDropData.length).fill(null);
+    shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
+
+    // Reset timer
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
+
+    // Sembunyikan semua screen
+    const screens = ['questionScreen', 'dragDropScreen', 'shortAnswerScreen', 'resultScreen'];
+    screens.forEach(screenId => {
+        const screen = document.getElementById(screenId);
+        if (screen) screen.classList.add('hidden');
+    });
+
+    // Tampilkan start screen
+    const startScreen = document.getElementById('startScreen');
+    if (startScreen) startScreen.classList.remove('hidden');
+
+    // Reset progress bars
+    const progressBars = ['quizProgress', 'dragDropProgress', 'shortAnswerProgress'];
+    progressBars.forEach(barId => {
+        const bar = document.getElementById(barId);
+        if (bar) bar.style.width = '0%';
+    });
+
+    // Reset review container
+    const reviewContainer = document.getElementById('reviewContainer');
+    if (reviewContainer) {
+        reviewContainer.innerHTML = '';
+        reviewContainer.style.display = 'none';
+    }
+
+    // Reset timer display
+    updateTimerDisplay();
+
+    // Scroll ke atas
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const reviewButton = document.getElementById('reviewAnswers');
+    const retakeButton = document.getElementById('retakeQuiz');
+    const reviewContainer = document.getElementById('reviewContainer');
+    const startScreen = document.getElementById('startScreen');
+    const questionScreen = document.getElementById('questionScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const dragDropScreen = document.getElementById('dragDropScreen');
+    const shortAnswerScreen = document.getElementById('shortAnswerScreen');
+
+    // Event listener untuk tombol Lihat Pembahasan
+    reviewButton.addEventListener('click', () => {
+        showReview();
+        // Scroll ke bagian review
+        reviewContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Event listener untuk tombol Ulangi Kuis
+    retakeButton.addEventListener('click', () => {
+        if (confirm('Anda yakin ingin mengulang kuis? Semua jawaban akan dihapus.')) {
+            resetQuiz();
+        }
+    });
+});
+
+// Fungsi untuk menampilkan review/pembahasan
+function showReview() {
+    const reviewContainer = document.getElementById('reviewContainer');
+    reviewContainer.innerHTML = '';
+    
+    // Review untuk soal pilihan ganda
+    quizData.forEach((question, index) => {
+        const userAnswer = answers[index];
+        const reviewItem = document.createElement('div');
+        reviewItem.className = `review-item ${userAnswer === question.correct ? 'correct' : 'incorrect'}`;
+        
+        reviewItem.innerHTML = `
+            <h4>Soal ${index + 1}</h4>
+            <p class="question">${question.question}</p>
+            <p class="user-answer">Jawaban Anda: ${userAnswer !== null ? question.options[userAnswer] : 'Tidak dijawab'}</p>
+            <p class="correct-answer">Jawaban Benar: ${question.options[question.correct]}</p>
+            <div class="explanation">
+                <p>${question.explanation}</p>
+            </div>
+        `;
+        
+        reviewContainer.appendChild(reviewItem);
+    });
+
+    // Review untuk soal menyusun urutan
+    dragDropData.forEach((question, index) => {
+        const isCorrect = dragDropAnswers[index];
+        const reviewItem = document.createElement('div');
+        reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+        
+        reviewItem.innerHTML = `
+            <h4>Soal Menyusun ${index + 1}</h4>
+            <p class="question">${question.question}</p>
+            <p class="status">Status: ${isCorrect ? 'Benar' : 'Perlu diperbaiki'}</p>
+            <div class="correct-order">
+                <p>Urutan yang Benar:</p>
+                <ol>
+                    ${question.correctOrder.map(idx => `<li>${question.items[idx]}</li>`).join('')}
+                </ol>
+            </div>
+            <div class="explanation">
+                <p>${question.explanation}</p>
+            </div>
+        `;
+        
+        reviewContainer.appendChild(reviewItem);
+    });
+
+    // Review untuk soal isian singkat
+    shortAnswerData.forEach((question, index) => {
+        const userAnswer = shortAnswerAnswers[index];
+        const isCorrect = userAnswer === question.correctAnswer;
+        const reviewItem = document.createElement('div');
+        reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+        
+        reviewItem.innerHTML = `
+            <h4>Soal Isian ${index + 1}</h4>
+            <p class="question">${question.question}</p>
+            <p class="user-answer">Jawaban Anda: ${userAnswer || 'Tidak dijawab'}</p>
+            <p class="correct-answer">Jawaban Benar: ${question.correctAnswer}</p>
+            <div class="explanation">
+                <p>${question.explanation}</p>
+            </div>
+        `;
+        
+        reviewContainer.appendChild(reviewItem);
+    });
+
+    // Tampilkan container review
+    reviewContainer.style.display = 'block';
+}

@@ -29,7 +29,7 @@ body {
 /* Fixed Top Navigation */
 nav {
     background: var(--gradient-bg);
-    padding: 1rem 2rem;
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -44,6 +44,8 @@ nav {
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .nav-links {
