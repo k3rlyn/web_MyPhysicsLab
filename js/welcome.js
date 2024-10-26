@@ -100,7 +100,7 @@ function updateProgress() {
         if (progress >= 100) {
             clearInterval(progressInterval);
             isAnimating = false;
-            localStorage.setItem('learningProgress', '100');
+            //localStorage.setItem('learningProgress', '100');
             setTimeout(() => {
                 window.location.href = 'pages/materials.html';
             }, 5000);
@@ -111,6 +111,14 @@ function updateProgress() {
             progressBar.setAttribute('aria-valuenow', progress);
         }
     }, 30);
+}
+// Reset progress jika diperlukan (optional)
+function resetProgress() {
+    localStorage.removeItem('learningProgress');
+    progress = 0;
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    progressBar.setAttribute('aria-valuenow', 0);
 }
 
 // Server-Sent Events untuk update real-time
