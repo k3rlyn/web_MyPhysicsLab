@@ -88,15 +88,29 @@ animateParticles();
 // Progress Bar Animation
 const progressBar = document.getElementById('learningProgress');
 let progress = 0;
-
+let progressInterval;
+let isAnimating = false;
 function updateProgress() {
-    if (progress < 100) {
-        progress++;
-        progressBar.style.width = progress + '%';
-        progressBar.textContent = progress + '%';
-        progressBar.setAttribute('aria-valuenow', progress);
-        setTimeout(updateProgress, 50);
+    if (isAnimating){
+        clearInterval(progressInterval);
     }
+    isAnimating = true;
+    progress = 0;
+    progressInterval = setInterval(() => {
+        if (progress >= 100) {
+            clearInterval(progressInterval);
+            isAnimating = false;
+            localStorage.setItem('learningProgress', '100');
+            setTimeout(() => {
+                window.location.href = 'pages/materials.html';
+            }, 5000);
+        } else{
+            progress++;
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+            progressBar.setAttribute('aria-valuenow', progress);
+        }
+    }, 30);
 }
 
 // Server-Sent Events untuk update real-time
