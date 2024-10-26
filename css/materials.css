@@ -373,3 +373,184 @@ footer {
         display: none;
     }
 }
+
+/* Content Typography */
+.theory-section {
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.theory-section h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    line-height: 1.2;
+}
+
+.theory-section h3 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 2.5rem 0 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eef2ff;
+}
+
+.theory-section p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+/* Formula Box */
+.formula {
+    background: #f8faff;
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 2rem 0;
+    border-left: 4px solid var(--primary-color);
+}
+
+.formula p {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.formula ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.formula ul li {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 0.8rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.formula ul li:before {
+    content: "•";
+    color: var(--primary-color);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Content Sections */
+.content-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Example List */
+.theory-section ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1.5rem 0;
+}
+
+.theory-section ul li {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.theory-section ul li:before {
+    content: "→";
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+}
+
+/* Bunyi Hukum (Law Statement) */
+.theory-section p:has(+ .video-container) {
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--primary-color);
+    background: #f8faff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 2rem 0;
+    text-align: center;
+    border-left: 4px solid var(--primary-color);
+}
+
+/* Video Container */
+.video-container {
+    margin: 2.5rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.video-container video {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16/9;
+}
+
+/* Interactive Demo */
+.interactive-demo {
+    background: #f8faff;
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 2.5rem 0;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+/* Practice Section */
+.practice-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #eef2ff;
+}
+
+.practice-section h3 {
+    color: var(--primary-color);
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .theory-section h2 {
+        font-size: 2rem;
+    }
+
+    .theory-section h3 {
+        font-size: 1.5rem;
+    }
+
+    .theory-section p {
+        font-size: 1rem;
+    }
+
+    .formula p {
+        font-size: 1.1rem;
+    }
+}
