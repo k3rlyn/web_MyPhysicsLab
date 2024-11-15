@@ -34,7 +34,7 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
   
 ## Cara Menggunakan & Mengakses
 
-1. **Akses Website**: Buka browser web dan kunjungi situs MyPhysicsLab di https://myphysicslab.vercel.app/.
+1. **Akses Website**: Buka browser web dan kunjungi situs MyPhysicsLab di https://myphysicslab.vercel.app/
 2. **Navigasi Menu**:
    - Pilih **Beranda** untuk kembali ke halaman utama.
    - Pilih **Materi** untuk mempelajari konsep Fisika.
