@@ -6,15 +6,15 @@
       "use": "@vercel/node"
     },
     {
-      "src": "*.html",
+      "src": "**/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "*.css",
+      "src": "**/*.css",
       "use": "@vercel/static"
     },
     {
-      "src": "*.js",
+      "src": "**/*.js",
       "use": "@vercel/static"
     },
     {
@@ -32,12 +32,24 @@
       "dest": "server/index.js"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "src": "/pages/(.*)\\.html",
+      "dest": "/pages/$1.html"
     },
     {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
+      "src": "/materi",
+      "dest": "/pages/materi.html"
+    },
+    {
+      "src": "/kuis",
+      "dest": "/pages/kuis.html"
+    },
+    {
+      "src": "/about",
+      "dest": "/pages/about.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/pages/login.html"
     },
     {
       "src": "/css/(.*)",
@@ -46,6 +58,17 @@
     {
       "src": "/js/(.*)",
       "dest": "/js/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
