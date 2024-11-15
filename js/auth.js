@@ -1,5 +1,5 @@
-const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
-
+//const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
+const API_URL = 'https://myphysicslab.vercel.app/api';
 // Fungsi utilitas untuk menampilkan pesan
 function showMessage(type, message) {
     const existingMessage = document.querySelector(`.${type}-message`);

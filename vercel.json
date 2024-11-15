@@ -28,6 +28,14 @@
   ],
   "routes": [
     {
+      "src": "/api/auth/(.*)",
+      "dest": "server/index.js"
+    },
+    {
+      "src": "/api/users/(.*)",
+      "dest": "server/index.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "server/index.js"
     },

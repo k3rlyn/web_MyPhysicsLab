@@ -1,5 +1,5 @@
-const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
-
+//const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
+const API_URL = 'https://myphysicslab.vercel.app/api';
 document.addEventListener('DOMContentLoaded', function() {
     // Cek autentikasi
     const token = localStorage.getItem('token');
