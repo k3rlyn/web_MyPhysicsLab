@@ -29,16 +29,18 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
   - Drag and Drop
 - **JavaScript**: Untuk interaktivitas dan dinamika halaman web.
 - **Desain Responsif**: Menggunakan tipografi yang menarik, pemilihan warna yang tepat, dan layout yang responsif untuk pengalaman pengguna yang optimal di berbagai perangkat.
-
+- **Autentikasi Pengguna dan Penyimpanan State Pengguna Terautentikasi**
+  
 ## Cara Menggunakan
 
-1. **Akses Website**: Buka browser web dan kunjungi situs MyPhysicsLab.
+1. **Akses Website**: Buka browser web dan kunjungi situs MyPhysicsLab di https://myphysicslab.vercel.app/.
 2. **Navigasi Menu**:
    - Pilih **Beranda** untuk kembali ke halaman utama.
    - Pilih **Materi** untuk mempelajari konsep Fisika.
    - Pilih **Kuis** untuk mengerjakan latihan soal.
    - Pilih **About Us** untuk mengetahui lebih lanjut tentang kami.
    - Pilih **Login** untuk masuk dan mengakses fitur secara penuh.
+   - Pilih **Daftar** untuk membuat akun di MyPhysicsLab.
 3. **Mengerjakan Latihan Soal dari Materi dan Kuis**:
    - Jawab pertanyaan yang disediakan untuk menguji pemahaman Anda.
    - Latihan Soal dan Kuis disajikan dalam format interaktif dengan disertai nilai skor dan pembahasan secara langsung.
