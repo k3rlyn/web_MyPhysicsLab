@@ -13,25 +13,13 @@ const progressRoutes = require('./routes/progressRoutes');
 connectDB();
 
 // Middleware
-const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'https://k3rlyn.github.io/web_MyPhysicsLab/', 
-        'https://railway.app/project/6e271b85-0627-4880-a600-0feaf35767f3'
-
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
 // Test route
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.send('API Running');
 });
 
