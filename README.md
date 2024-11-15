@@ -14,7 +14,9 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
 - **Beranda**: Tampilan utama yang memberikan gambaran umum dan navigasi ke fitur lainnya.
 - **Materi**: Penjelasan mendalam tentang Hukum Newton dan Hukum Ohm, dilengkapi dengan ilustrasi dan simulasi interaktif.
 - **Kuis**: Latihan soal interaktif untuk menguji pemahaman pengguna terhadap materi yang telah dipelajari.
-- **About Us**: Informasi tentang tim pengembang dan tujuan dari MyPhysicsLab.
+- **About Us**: Informasi tentang Virtual Lab MyPhysicsLab.
+- **Daftar**: Memungkinkan pengguna baru untuk membuat akun di MyPhysicsLab sehingga dapat mengakses fitur Virtual Lab MyPhysicsLab secara penuh.
+- **Masuk**: Memungkinkan pengguna yang sudah memiliki akun di MyPhysicsLab untuk mengakses dan melanjutkan pembelajaran & aktivitas di Virtual Lab MyPhysicsLab.
 
 ## Teknologi yang Digunakan
 
@@ -36,9 +38,10 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
    - Pilih **Materi** untuk mempelajari konsep Fisika.
    - Pilih **Kuis** untuk mengerjakan latihan soal.
    - Pilih **About Us** untuk mengetahui lebih lanjut tentang kami.
+   - Pilih **Login** untuk masuk dan mengakses fitur secara penuh.
 3. **Mengerjakan Latihan Soal dari Materi dan Kuis**:
    - Jawab pertanyaan yang disediakan untuk menguji pemahaman Anda.
-   - Latihan Soal dan Kuis disajikan dalam format interaktif dengan umpan balik langsung.
+   - Latihan Soal dan Kuis disajikan dalam format interaktif dengan disertai nilai skor dan pembahasan secara langsung.
 
 ## Disusun oleh:
 

@@ -8,15 +8,29 @@
     <link rel="stylesheet" href="../css/materials.css">
     
 </head>
-<body>
+<body style="display: none;">
+     <!-- Script proteksi -->
+     <script>
+        // Cek login
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '../pages/auth/login.html';
+        } else {
+            document.body.style.display = 'block';
+        }
+    </script>
     <nav>
         <a href="/" class="nav-brand">MyPhysicsLab</a>
         <div class="nav-links">
             <a href="../index.html">Beranda</a>
             <a href="materials.html" class="active">Materi</a>
-            
             <a href="quiz.html">Kuis</a>
             <a href="about.html">About Us</a>
+
+            <div id="userMenu" class="user-menu">
+                <span id="userName" class="user-name"></span>
+                <button onclick="logout()" class="logout-button">Logout</button>
+            </div>
         </div>
     </nav>
     
@@ -32,10 +46,10 @@
                 </ul>
                 
                 <div class="progress-tracker">
-                    <h4>Progress Belajar</h4>
+                    <h4>Progress Belajar (/≧▽≦)/</h4>
                     <div class="progress-bar">
                         <div class="progress" id="learningProgress" role="progressbar" 
-                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <span id="progressText">0%</span>
                 </div>
@@ -157,7 +171,7 @@
                     <div class="practice-section">
                         <h3>Latihan Soal</h3>
                         <div class="interactive-problem">
-                            <p>Sebuah benda bermassa 5 kg didorong dengan gaya 20 N. Berapakah percepatannya?</p>
+                            <h4><p>Sebuah benda bermassa 5 kg didorong dengan gaya 20 N. Berapakah percepatannya?</p></h4>
                             <input type="number" id="problemAnswer" placeholder="Masukkan jawaban">
                             <button id="checkAnswer">Periksa Jawaban</button>
                             <p id="answerFeedback"></p>
@@ -189,13 +203,27 @@
                             <li>Balon yang dilepaskan</li>
                             <li>Roket yang meluncur</li>
                         </ul>
+                        
 
+                        
                         <div class="interactive-demo">
                             <canvas id="newton3Canvas" width="600" height="300"></canvas>
                             <div class="controls">
                                 <button id="startRocket">Luncurkan Roket</button>
                                 <button id="resetRocket">Reset</button>
                             </div>
+                        </div>
+                        <h4>Penjelasan Simulasi Peluncuran Roket</h4>
+                        <p>Simulasi di atas menggambarkan aplikasi Hukum Newton III yaitu peluncuran roket, di mana aksi (gas yang dikeluarkan) menghasilkan reaksi (roket meluncur). Dalam hal ini, roket mendapatkan gaya yang sama besar namun berlawanan arah.</p>
+                    </div>
+
+                    <div class="practice-section">
+                        <h3>Latihan Soal</h3>
+                        <div class="interactive-problem">
+                            <h4><p>Sebuah buku diletakkan di atas meja. Meja diletakkan di atas bumi. Massa buku adalah 2 kg jika percepatan gravitasi bumi 10 m/s2 maka hitunglah besar gaya reaksi bumi terhadap buku (jawab tanpa satuan)!</p></h4>
+                            <input type="number" id="newton3Answer" placeholder="Masukkan jawaban">
+                            <button id="checkNewton3">Periksa Jawaban</button>
+                            <p id="newton3Feedback"></p>
                         </div>
                     </div>
                 </div>
@@ -240,8 +268,19 @@
                                 </label>
                             </div>
                         </div>
+                        <h4>Penjelasan Simulasi Hukum Ohm</h4>
+                        <p>Pada simulasi di atas, terdapat lingkaran dengan titik-titik merah yang berputar beserta 2 slider yang mengatur nilai tegangan (V) dan hambatan (R). Pada simulasi tersebut, kecepatan rotasi lingkaran berhubungan lamgsung dengan besar arus listrik (I). Dalam simulasi di atas, gerakan lingkaran yang semakin cepat atau lambat menggambarkan perubahan nilai arus sesuai dengan perubahan tegangan atau hambatan. Dalam hal ini, dapat dilihat bahwa kuat arus listrik (I) sebanding dengan tegangan (V) namun berbanding terbalik dengan hambatan (R).</p>
                     </div>
-                </div>
+
+                    <div class="practice-section">
+                        <h3>Latihan Soal</h3>
+                        <div class="interactive-problem">
+                            <h4><p>Terdapat sebuah rangkaian listrik yang memiliki hambatan 8 Ω dan dialiri arus listrik sebesar 7 A, berapakah tegangan pada rangkaian tersebut?</p></h4>
+                            <input type="number" id="ohmAnswer" placeholder="Masukkan jawaban">
+                            <button id="checkOhm">Periksa Jawaban</button>
+                            <p id="ohmFeedback"></p>
+                        </div>
+                    </div>
             </article>
         </section>
     </main>
@@ -271,9 +310,21 @@
         </div>
     </footer>
 
-    <script src="../js/materials.js"></script>
-
+    
     <script>
+        // Tampilkan nama user
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.name) {
+            document.getElementById('userName').textContent = user.name;
+        }
+
+        // Fungsi logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '../pages/auth/login.html';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.createElement('button');
             sidebarToggle.className = 'sidebar-toggle';
@@ -296,5 +347,8 @@
         </script>
         </body>
         </html>
+        <script src="../js/materials.js"></script>
+        <script src="../js/materialsInit.js"></script>
+
 </body>
 </html>

@@ -8,7 +8,17 @@
     <link rel="stylesheet" href="../css/quiz.css">
 </head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<body>
+<body style='display: none;'>
+    <script>
+        // Cek login
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '../pages/auth/login.html';
+        } else {
+            document.body.style.display = 'block';
+        }
+    </script>
+
     <header>
         <nav>
             <div class="nav-container">
@@ -27,6 +37,13 @@
                        
                         <li><a href="quiz.html" class="active">Kuis</a></li>
                         <li><a href="about.html">About Us</a></li>
+                    
+                        <!-- menu user -->
+                        <div id="userMenu" class="user-menu">
+                            <span id="userName" class="user-name"></span>
+                            <button onclick="logout()" class="logout-button">Logout</button>
+                        </div>
+                    
                     </ul>
                 </nav>
             </div>
@@ -207,5 +224,7 @@
     </footer>
 
     <script src="../js/quiz.js"></script>
+    <script src="../js/quizInit.js"></script>
+
 </body>
 </html>

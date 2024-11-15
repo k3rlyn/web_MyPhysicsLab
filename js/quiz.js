@@ -1,3 +1,156 @@
+const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
+class QuizManager {
+    constructor() {
+        this.token = localStorage.getItem('token');
+        this.quizResults = [];
+    }
+
+    async loadQuizResults() {
+        try {
+            const response = await fetch(`${API_URL}/progress/my-progress`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to load quiz results');
+            const data = await response.json();
+            this.quizResults = data.quizResults || [];
+            return this.quizResults;
+        } catch (error) {
+            console.error('Error loading quiz results:', error);
+            throw error;
+        }
+    }
+
+    async saveQuizResults(quizData) {
+        try {
+            const response = await fetch(`${API_URL}/progress/quiz/complete`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`, // Gunakan this.token yang sudah ada
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quizId: 'physics-quiz-1',
+                    score: quizData.score,
+                    multipleChoiceAnswers: quizData.mcAnswers.map(answer => ({
+                        questionId: answer.questionId,
+                        userAnswer: answer.selected,
+                        correctAnswer: answer.correct,
+                        isCorrect: answer.selected === answer.correct
+                    })),
+                    dragDropAnswers: quizData.ddAnswers.map(answer => ({
+                        questionId: answer.questionId,
+                        userOrder: answer.userOrder,
+                        correctOrder: answer.correctOrder,
+                        isCorrect: JSON.stringify(answer.userOrder) === JSON.stringify(answer.correctOrder)
+                    })),
+                    shortAnswers: quizData.shortAnswers.map(answer => ({
+                        questionId: answer.questionId,
+                        userAnswer: answer.userAnswer,
+                        correctAnswer: answer.correctAnswer,
+                        isCorrect: answer.userAnswer.trim().toLowerCase() === answer.correctAnswer.trim().toLowerCase()
+                    }))
+                })
+            });
+            
+            if (!response.ok) throw new Error('Failed to save quiz results');
+            const result = await response.json();
+            this.quizResults = result.quizResults; // Update local quizResults
+            return result;
+        } catch (error) {
+            console.error('Error saving quiz results:', error);
+            throw error;
+        }
+    }
+
+    displayQuizResults() {
+        const container = document.getElementById('quizResults');
+        if (container && this.quizResults.length > 0) {
+            container.innerHTML = this.quizResults
+                .map(result => `
+                    <div class="quiz-result">
+                        <p class="quiz-name">Quiz: ${result.quizId}</p>
+                        <p class="quiz-score">Score: ${result.score}%</p>
+                        <p class="quiz-date">Completed: ${new Date(result.completedAt).toLocaleDateString()}</p>
+                        
+                        <div class="quiz-details">
+                            <h4>Multiple Choice Questions</h4>
+                            ${result.multipleChoiceAnswers.map((answer, index) => `
+                                <div class="answer-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                    <p>Question ${index + 1}: ${answer.isCorrect ? '✓' : '✗'}</p>
+                                    <p>Your answer: ${answer.userAnswer}</p>
+                                    <p>Correct answer: ${answer.correctAnswer}</p>
+                                </div>
+                            `).join('')}
+
+                            <h4>Drag & Drop Questions</h4>
+                            ${result.dragDropAnswers.map((answer, index) => `
+                                <div class="answer-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                    <p>Question ${index + 1}: ${answer.isCorrect ? '✓' : '✗'}</p>
+                                    <p>Your order: ${answer.userOrder.join(', ')}</p>
+                                    <p>Correct order: ${answer.correctOrder.join(', ')}</p>
+                                </div>
+                            `).join('')}
+
+                            <h4>Short Answer Questions</h4>
+                            ${result.shortAnswers.map((answer, index) => `
+                                <div class="answer-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                    <p>Question ${index + 1}: ${answer.isCorrect ? '✓' : '✗'}</p>
+                                    <p>Your answer: ${answer.userAnswer}</p>
+                                    <p>Correct answer: ${answer.correctAnswer}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+
+            // Add CSS classes
+            container.classList.add('quiz-results-container');
+        }
+    }
+    // Helper method to get latest quiz score
+    getLatestScore() {
+        if (this.quizResults.length === 0) return null;
+        return this.quizResults[this.quizResults.length - 1].score;
+    }
+
+    // Helper method to get quiz history
+    getQuizHistory() {
+        return this.quizResults.map(result => ({
+            quizId: result.quizId,
+            score: result.score,
+            date: new Date(result.completedAt)
+        }));
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Cek autentikasi
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../pages/auth/login.html';
+        return;
+    }
+
+    // Tampilkan nama user
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.name) {
+        document.getElementById('userName').textContent = user.name;
+    }
+
+    // Inisialisasi quiz
+    initQuiz();
+});
+
+// Fungsi logout
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '../pages/auth/login.html';
+}
+
 // WebSocket Connection
 const ws = new WebSocket('wss://echo.websocket.org');
 
@@ -214,12 +367,31 @@ function initQuiz() {
     dragDropAnswers = new Array(dragDropData.length).fill(null);
     shortAnswerAnswers = new Array(shortAnswerData.length).fill('');
     
-    // Start Quiz Button
-    document.getElementById('startQuiz').addEventListener('click', () => {
-        document.getElementById('startScreen').classList.add('hidden');
-        document.getElementById('questionScreen').classList.remove('hidden');
-        showQuestion(0);
-        startTimer();
+    // Reset form
+    const optionsForm = document.getElementById('optionsForm');
+    if (optionsForm) optionsForm.innerHTML = '';
+
+     // Start Quiz Button
+     const startButton = document.getElementById('startQuiz');
+     if (startButton) {
+         // Remove existing event listeners
+         startButton.replaceWith(startButton.cloneNode(true));
+         
+         // Add new event listener
+         document.getElementById('startQuiz').addEventListener('click', () => {
+             document.getElementById('startScreen').classList.add('hidden');
+             document.getElementById('questionScreen').classList.remove('hidden');
+             showQuestion(0);
+             startTimer();
+         });
+     }
+
+    // Remove and re-add event listeners for navigation buttons
+    ['nextQuestion', 'prevQuestion', 'nextDragDrop', 'prevDragDrop', 'nextShortAnswer', 'prevShortAnswer'].forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.replaceWith(button.cloneNode(true));
+        }
     });
 
     // Navigation Buttons
@@ -236,10 +408,10 @@ function initQuiz() {
     
 
 
-// Show Drag & Drop Question
-function showDragDropQuestion(index) {
-    currentDragDropQuestion = index;
-    const question = dragDropData[index];
+    // Show Drag & Drop Question
+    function showDragDropQuestion(index) {
+        currentDragDropQuestion = index;
+        const question = dragDropData[index];
     
     // Update nomor soal dan progress
     document.getElementById('currentDragDrop').textContent = `${index + 1}/5`;
@@ -286,45 +458,46 @@ function showDragDropQuestion(index) {
     // Sembunyikan penjelasan
     document.getElementById('dragDropExplanation').classList.add('hidden');
     updateDragDropNavigation();
-}
+
+    
+    }
 
 function showShortAnswerQuestion(index) {
     currentShortAnswer = index;
     const question = shortAnswerData[index];
     
     // Update nomor soal dan progress
-    document.getElementById('currentShortAnswer').textContent = `${index + 1}/5`;
-    //document.getElementById('shortAnswerQuestion').textContent = question.question;
-    document.getElementById('shortAnswerProgress').style.width = 
-        `${((index + 1) / shortAnswerData.length) * 100}%`;
+    const currentNumberElement = document.getElementById('currentShortAnswer');
+    const progressElement = document.getElementById('shortAnswerProgress');
+    
+    if (currentNumberElement) {
+        currentNumberElement.textContent = `${index + 1}/5`;
+    }
+    
+    if (progressElement) {
+        progressElement.style.width = `${((index + 1) / shortAnswerData.length) * 100}%`;
+    }
     
     // Update teks pertanyaan
-    document.getElementById('shortAnswerQuestion').textContent = question.question;
+    const questionElement = document.getElementById('shortAnswerQuestion');
+    if (questionElement) {
+        questionElement.textContent = question.question;
+    }
     
     // Reset atau isi input jawaban
     const input = document.getElementById('shortAnswerInput');
-    input.value = shortAnswerAnswers[index] || '';
+    if (input) {
+        input.value = shortAnswerAnswers[index] || '';
+    }
     
     // Sembunyikan penjelasan
-    document.getElementById('shortAnswerExplanation').classList.add('hidden');
-    updateShortAnswerNavigation();
-
-    // Update navigasi
-    const nextButton = document.getElementById('nextShortAnswer');
-    const prevButton = document.getElementById('prevShortAnswer');
-    
-    if (currentShortAnswer === shortAnswerData.length - 1) {
-        nextButton.textContent = 'Selesai';
-    } else {
-        nextButton.textContent = 'Selanjutnya';
-    }
-
-    // Sembunyikan penjelasan untuk soal baru
     const explanation = document.getElementById('shortAnswerExplanation');
     if (explanation) {
         explanation.classList.add('hidden');
     }
-
+    
+    // Update navigasi
+    updateShortAnswerNavigation();
 }
 
 // Fungsi Navigasi dan State
@@ -352,9 +525,37 @@ function updateShortAnswerNavigation() {
     const prevButton = document.getElementById('prevShortAnswer');
     const nextButton = document.getElementById('nextShortAnswer');
     
-    prevButton.disabled = false;
-    nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 'Selesai' : 'Selanjutnya';
+    if (prevButton && nextButton) {
+        // Atur status tombol Previous
+        if (currentShortAnswer === 0) {
+            prevButton.classList.add('disabled');
+            prevButton.setAttribute('disabled', true);
+        } else {
+            prevButton.classList.remove('disabled');
+            prevButton.removeAttribute('disabled');
+        }
+
+        // Atur teks tombol Next
+        nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 'Selesai' : 'Selanjutnya';
+    }
 }
+
+// Utk navigasi short answer
+function prevShortAnswer() {
+    const prevButton = document.getElementById('prevShortAnswer');
+    
+    if (currentShortAnswer > 0) {
+        currentShortAnswer--;
+        showShortAnswerQuestion(currentShortAnswer);
+    } else if (prevButton && !prevButton.disabled) {
+        // Kembali ke bagian drag & drop
+        document.getElementById('shortAnswerScreen').classList.add('hidden');
+        document.getElementById('dragDropScreen').classList.remove('hidden');
+        showDragDropQuestion(dragDropData.length - 1);
+    }
+}
+
+
 function nextShortAnswer() {
     const input = document.getElementById('shortAnswerInput');
     if (input.value.trim()) {
@@ -625,6 +826,8 @@ function showQuestion(index) {
     document.getElementById('quizProgress').style.width = `${progress}%`;
     
     updateNavigation();
+
+    
 }
 
 // Navigation Functions
@@ -700,7 +903,19 @@ function startTimer() {
 
     updateTimerDisplay(); // Update display awal
 }
-}
+
+    // Add prevShortAnswer handler
+    const prevShortAnswerBtn = document.getElementById('prevShortAnswer');
+    if (prevShortAnswerBtn) {
+        prevShortAnswerBtn.replaceWith(prevShortAnswerBtn.cloneNode(true));
+        const newPrevButton = document.getElementById('prevShortAnswer');
+        if (newPrevButton) {
+            newPrevButton.addEventListener('click', prevShortAnswer);
+        }
+    }
+
+} // Init Quiz sampe sini
+
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -824,6 +1039,26 @@ function showReview() {
         
         reviewContainer.appendChild(reviewItem);
     });
+
+    // Review short answer
+    shortAnswerAnswers.forEach((answer, index) => {
+        const question = shortAnswerData[index];
+        const isCorrect = answer === question.correctAnswer;
+        const reviewItem = document.createElement('div');
+        reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
+        
+        reviewItem.innerHTML = `
+            <h4>Soal Isian Singkat ${index + 1}</h4>
+            <p>${question.question}</p>
+            <p>Jawaban Anda: ${answer || 'Tidak dijawab'}</p>
+            <p>Jawaban Benar: ${question.correctAnswer}</p>
+            <p class="explanation">${question.explanation}</p>
+        `;
+        
+        reviewContainer.appendChild(reviewItem);
+    });
+
+    reviewContainer.classList.remove('hidden');
 }
 
 // Initialize quiz when page loads
@@ -889,25 +1124,6 @@ function checkShortAnswer() {
     return true;
 
 
-    // Tampilkan feedback
-    feedback.classList.remove('hidden');
-    feedback.innerHTML = `
-        <div class="feedback-box ${isCorrect ? 'correct' : 'incorrect'}">
-            <div class="feedback-header">
-                ${isCorrect ? '✓ Benar!' : '✗ Kurang tepat'}
-            </div>
-            <div class="feedback-explanation">
-                ${currentQuestion.explanation}
-            </div>
-        </div>
-    `;
-    
-    // Update tombol
-    nextButton.textContent = currentShortAnswer === shortAnswerData.length - 1 ? 
-        'Selesai' : 'Selanjutnya';
-    
-    // Simpan jawaban
-    shortAnswerAnswers[currentShortAnswer] = answer;
 }
 
 // Update fungsi nextShortAnswer
@@ -962,36 +1178,71 @@ function resetQuiz() {
     }
 
     // Sembunyikan semua screen
-    const screens = ['questionScreen', 'dragDropScreen', 'shortAnswerScreen', 'resultScreen'];
-    screens.forEach(screenId => {
-        const screen = document.getElementById(screenId);
-        if (screen) screen.classList.add('hidden');
-    });
+    document.getElementById('questionScreen').classList.add('hidden');
+    document.getElementById('dragDropScreen').classList.add('hidden');
+    document.getElementById('shortAnswerScreen').classList.add('hidden');
+    document.getElementById('resultScreen').classList.add('hidden');
 
     // Tampilkan start screen
-    const startScreen = document.getElementById('startScreen');
-    if (startScreen) startScreen.classList.remove('hidden');
+    document.getElementById('startScreen').classList.remove('hidden');
 
     // Reset progress bars
-    const progressBars = ['quizProgress', 'dragDropProgress', 'shortAnswerProgress'];
-    progressBars.forEach(barId => {
-        const bar = document.getElementById(barId);
-        if (bar) bar.style.width = '0%';
-    });
+    document.getElementById('quizProgress').style.width = '0%';
+    document.getElementById('dragDropProgress').style.width = '0%';
+    document.getElementById('shortAnswerProgress').style.width = '0%';
 
     // Reset review container
     const reviewContainer = document.getElementById('reviewContainer');
     if (reviewContainer) {
         reviewContainer.innerHTML = '';
-        reviewContainer.style.display = 'none';
+        reviewContainer.classList.add('hidden');
     }
+
+    //reset penjelasan
+    const dragDropExplanation = document.getElementById('dragDropExplanation');
+    const shortAnswerExplanation = document.getElementById('shortAnswerExplanation');
+    if (dragDropExplanation) dragDropExplanation.classList.add('hidden');
+    if (shortAnswerExplanation) shortAnswerExplanation.classList.add('hidden');
+
+    // reset status kuis (Quiz State)
+    const timerDisplay = document.getElementById('timer');
+    if (timerDisplay) {
+        timerDisplay.textContent = '30:00';
+    }
+
+    // reset current number displays
+    const currentNumber = document.getElementById('currentNumber');
+    if (currentNumber) currentNumber.textContent = '1/5';
+
+    // Tampilkan ulang start screen dengan kondisi awal
+    initQuiz();
 
     // Reset timer display
     updateTimerDisplay();
 
     // Scroll ke atas
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Reset forms dan pilihan
+    const optionsForm = document.getElementById('optionsForm');
+    if (optionsForm) {
+        optionsForm.innerHTML = ''; // Kosongkan form pilihan ganda
+    }
+
+    // Reset drag & drop
+    const dragItems = document.getElementById('dragItems');
+    const dropZones = document.getElementById('dropZones');
+    if (dragItems) dragItems.innerHTML = '';
+    if (dropZones) dropZones.innerHTML = '';
+
+    // Reset short answer
+    const shortAnswerInput = document.getElementById('shortAnswerInput');
+    if (shortAnswerInput) {
+        shortAnswerInput.value = '';
+    }
 }
+
+
 document.addEventListener('DOMContentLoaded', () => {
     const reviewButton = document.getElementById('reviewAnswers');
     const retakeButton = document.getElementById('retakeQuiz');
@@ -1015,76 +1266,5 @@ document.addEventListener('DOMContentLoaded', () => {
             resetQuiz();
         }
     });
-});
-
-// Fungsi untuk menampilkan review/pembahasan
-function showReview() {
-    const reviewContainer = document.getElementById('reviewContainer');
-    reviewContainer.innerHTML = '';
     
-    // Review untuk soal pilihan ganda
-    quizData.forEach((question, index) => {
-        const userAnswer = answers[index];
-        const reviewItem = document.createElement('div');
-        reviewItem.className = `review-item ${userAnswer === question.correct ? 'correct' : 'incorrect'}`;
-        
-        reviewItem.innerHTML = `
-            <h4>Soal ${index + 1}</h4>
-            <p class="question">${question.question}</p>
-            <p class="user-answer">Jawaban Anda: ${userAnswer !== null ? question.options[userAnswer] : 'Tidak dijawab'}</p>
-            <p class="correct-answer">Jawaban Benar: ${question.options[question.correct]}</p>
-            <div class="explanation">
-                <p>${question.explanation}</p>
-            </div>
-        `;
-        
-        reviewContainer.appendChild(reviewItem);
-    });
-
-    // Review untuk soal menyusun urutan
-    dragDropData.forEach((question, index) => {
-        const isCorrect = dragDropAnswers[index];
-        const reviewItem = document.createElement('div');
-        reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
-        
-        reviewItem.innerHTML = `
-            <h4>Soal Menyusun ${index + 1}</h4>
-            <p class="question">${question.question}</p>
-            <p class="status">Status: ${isCorrect ? 'Benar' : 'Perlu diperbaiki'}</p>
-            <div class="correct-order">
-                <p>Urutan yang Benar:</p>
-                <ol>
-                    ${question.correctOrder.map(idx => `<li>${question.items[idx]}</li>`).join('')}
-                </ol>
-            </div>
-            <div class="explanation">
-                <p>${question.explanation}</p>
-            </div>
-        `;
-        
-        reviewContainer.appendChild(reviewItem);
-    });
-
-    // Review untuk soal isian singkat
-    shortAnswerData.forEach((question, index) => {
-        const userAnswer = shortAnswerAnswers[index];
-        const isCorrect = userAnswer === question.correctAnswer;
-        const reviewItem = document.createElement('div');
-        reviewItem.className = `review-item ${isCorrect ? 'correct' : 'incorrect'}`;
-        
-        reviewItem.innerHTML = `
-            <h4>Soal Isian ${index + 1}</h4>
-            <p class="question">${question.question}</p>
-            <p class="user-answer">Jawaban Anda: ${userAnswer || 'Tidak dijawab'}</p>
-            <p class="correct-answer">Jawaban Benar: ${question.correctAnswer}</p>
-            <div class="explanation">
-                <p>${question.explanation}</p>
-            </div>
-        `;
-        
-        reviewContainer.appendChild(reviewItem);
-    });
-
-    // Tampilkan container review
-    reviewContainer.style.display = 'block';
-}
+});

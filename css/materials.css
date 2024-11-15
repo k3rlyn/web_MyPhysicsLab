@@ -1,4 +1,3 @@
-/* Reset dan Variables */
 :root {
     --primary-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     --secondary-gradient: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
@@ -7,7 +6,7 @@
     --white: #ffffff;
     --text-dark: #2c3e50;
     --background: #f8faff;
-    --sidebar-width: 280px;
+    --sidebar-width: 250px;
     --gradient-bg: linear-gradient(135deg, #1e3c72 0%, #4776c9 100%);
 }
 
@@ -85,7 +84,9 @@ main {
     transition: transform 0.3s ease;
     box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     z-index: 50;
-    transform: translateX(0);
+    top: 60px;
+    left: 0;
+    
 }
 
 .material-sidebar.collapsed {
@@ -262,6 +263,15 @@ main {
 
 /* Buttons */
 button {
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+button:not(.logout-button) {
     background: var(--secondary-gradient);
     color: var(--white);
     padding: 0.75rem 1.5rem;
@@ -337,8 +347,8 @@ footer {
     position: fixed;
     left: calc(var(--sidebar-width) - 15px);
     top: 80px;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     background: var(--accent-color);
     color: white;
     border: none;
@@ -350,6 +360,8 @@ footer {
     z-index: 1000;
     transition: all 0.3s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    min-width: 40px;
+    min-height: 40px;
 }
 
 .sidebar-toggle:hover {
@@ -359,16 +371,17 @@ footer {
 /* Responsive Design */
 @media (max-width: 768px) {
     .material-sidebar {
-        transform: translateX(-100%);
+        transform: 200px
     }
 
     .material-content {
-        margin-left: 0;
+        margin-left: 200px;
         padding: 1rem;
+    
     }
 
     .sidebar-toggle {
-        left: 20px;
+        left: 180px;
     }
 
     .nav-links {
@@ -555,4 +568,22 @@ footer {
     .formula p {
         font-size: 1.1rem;
     }
+    
 }
+
+.interactive-problem input[type="number"] {
+    padding: 10px 15px;
+    border: 2px solid #1e3c72;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    width: 200px;
+    margin: 1rem 0;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.interactive-problem input[type="number"]:focus {
+    border-color: #00c6ff;
+    box-shadow: 0 0 0 3px rgba(0, 198, 255, 0.2);
+}
+

@@ -1,3 +1,45 @@
+const API_URL = 'http://localhost:5000/api';  // sesuai dengan server yang sudah running
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Cek autentikasi
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '../pages/auth/login.html';
+        return;
+    }
+
+    // Tampilkan nama user
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.name) {
+        document.getElementById('userName').textContent = user.name;
+    }
+     // Navigasi Materi
+    document.querySelectorAll('.material-list li').forEach(item => {
+        item.addEventListener('click', () => {
+            // Update active state pada sidebar
+            document.querySelectorAll('.material-list li').forEach(li => li.classList.remove('active'));
+            item.classList.add('active');
+
+            // Update konten yang ditampilkan
+            const targetSection = item.dataset.section;
+            document.querySelectorAll('.material-section').forEach(section => {
+                section.classList.remove('active');
+                if (section.id === targetSection) {
+                    section.classList.add('active');
+                    updateProgress(targetSection);
+                }
+            });
+        });
+    });
+});
+
+// Fungsi logout
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '../pages/auth/login.html';
+}
+
 // Inisialisasi WebSocket
 const ws = new WebSocket('wss://echo.websocket.org');
 
@@ -11,24 +53,6 @@ ws.onclose = () => {
     document.getElementById('connectionStatus').style.color = '#f44336';
 };
 
-// Navigasi Materi
-document.querySelectorAll('.material-list li').forEach(item => {
-    item.addEventListener('click', () => {
-        // Update active state pada sidebar
-        document.querySelectorAll('.material-list li').forEach(li => li.classList.remove('active'));
-        item.classList.add('active');
-
-        // Update konten yang ditampilkan
-        const targetSection = item.dataset.section;
-        document.querySelectorAll('.material-section').forEach(section => {
-            section.classList.remove('active');
-            if (section.id === targetSection) {
-                section.classList.add('active');
-                updateProgress(targetSection);
-            }
-        });
-    });
-});
 
 // Progress Tracking
 let progress = {
@@ -63,13 +87,20 @@ function loadProgress() {
         progress = JSON.parse(savedProgress);
         updateProgressDisplay();
     } else {
+        // Hapus progress yang mungkin invalid 
+        localStorage.removeItem('learningProgress');
         // Set initial progress to 0
         localStorage.setItem('learningProgress', JSON.stringify(progress));
         updateProgressDisplay();
     }
 }
 function updateProgressDisplay() {
-    const totalProgress = Object.values(progress).reduce((a, b) => a + b, 0) / Object.keys(progress).length;
+    // Menghitung panjang progress
+    const progressLength = Object.keys(progress).length;
+    const totalProgress = progressLength > 0
+        ? Object.values(progress).reduce((a, b) => a + b, 0) / progressLength
+        : 0;
+    //const totalProgress = Object.values(progress).reduce((a, b) => a + b, 0) / Object.keys(progress).length;
     const progressBar = document.getElementById('learningProgress');
     const progressText = document.getElementById('progressText');
     
@@ -591,6 +622,8 @@ function resetDragDrop() {
 function checkOrder() {
     let isCorrect = true;
     let allZonesFilled = true;
+    let userOrder = [];
+    const correctOrder = [1, 2, 3];
     
     dropZones.forEach((zone, index) => {
         if (!zone.firstChild) {
@@ -599,6 +632,7 @@ function checkOrder() {
         }
         
         const orderValue = parseInt(zone.firstChild.dataset.order);
+        userOrder.push(orderValue);
         if (orderValue !== index + 1) {
             isCorrect = false;
         }
@@ -606,6 +640,10 @@ function checkOrder() {
 
     // Only show feedback if all zones are filled
     if (allZonesFilled) {
+        //simpan jawaban ke database
+        saveDragDropAnswer('newton1', userOrder, correctOrder, isCorrect);
+
+        //TAMPILKAN FEEDBACK
         let feedbackDiv = document.getElementById('dragDropFeedback');
         if (!feedbackDiv) {
             feedbackDiv = document.createElement('div');
@@ -629,57 +667,55 @@ initDragAndDrop();
 // Add event listener for reset button
 document.getElementById('resetDragDrop').addEventListener('click', resetDragDrop);
 
-// Interactive Problem
-document.getElementById('checkAnswer').addEventListener('click', () => {
-    const answer = parseFloat(document.getElementById('problemAnswer').value);
+// Interactive Problem Hukum Newton 2
+document.getElementById('checkAnswer').addEventListener('click', async() => {
+    const answerInput = document.getElementById('problemAnswer');
     const feedback = document.getElementById('answerFeedback');
     
+    if (!answerInput.value) {
+        feedback.textContent = 'Masukkan jawaban terlebih dahulu!';
+        feedback.className = 'warning';
+        return;
+    }
     // F = ma -> a = F/m
     // m = 5 kg, F = 20 N
-    const correctAnswer = 20 / 5; // = 4 m/s²
-    
-    if (Math.abs(answer - correctAnswer) < 0.1) {
-        feedback.textContent = 'Benar! Percepatan benda adalah 4 m/s²';
-        feedback.className = 'correct';
-    } else {
-        feedback.textContent = 'Jawaban kurang tepat. Coba lagi!';
-        feedback.className = 'incorrect';
-    }
-    // Toggle Sidebar
-    document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.material-sidebar');
-        const content = document.querySelector('.material-content');
-        const sidebarToggle = document.createElement('button');
-        
-        sidebarToggle.className = 'sidebar-toggle';
-        sidebarToggle.innerHTML = '←';
-        document.body.appendChild(sidebarToggle);
-        
-        let isCollapsed = false;
-        
-        function toggleSidebar() {
-            isCollapsed = !isCollapsed;
-            sidebar.classList.toggle('collapsed');
-            content.classList.toggle('expanded');
-            sidebarToggle.innerHTML = isCollapsed ? '→' : '←';
-            
-            if (isCollapsed) {
-                sidebar.style.transform = 'translateX(-100%)';
-                content.style.marginLeft = '0';
-                sidebarToggle.style.left = '10px';
-            } else {
-                sidebar.style.transform = 'translateX(0)';
-                content.style.marginLeft = 'var(--sidebar-width)';
-                sidebarToggle.style.left = 'calc(var(--sidebar-width) - 15px)';
-            }
-        }
-        
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        
-        // Initialize progress
-        loadProgress();
-    });
 
+    const answer = parseFloat(answerInput.value);
+    const correctAnswer = 20 / 5; // = 4 m/s²
+    const isCorrect = Math.abs(answer - correctAnswer) < 0.1;
+    
+    try {
+        const response = await fetch(`${API_URL}/progress/material/practice`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                material: 'newton2',
+                questionId: 'newton2_practice_1',
+                userAnswer: answer,
+                correctAnswer: correctAnswer
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to save answer');
+        const data = await response.json();
+        updateProgressDisplay(data.materialProgress);
+
+        if (isCorrect) {
+            feedback.textContent = 'Benar! a = F/m = 20 N / 5 kg = 4 m/s². Jadi, percepatan benda adalah 4 m/s²';
+            feedback.className = 'correct';
+        } else {
+            feedback.textContent = 'Jawaban kurang tepat. Coba lagi!';
+            feedback.className = 'incorrect';
+        }
+    } catch (error) {
+        console.error('Error saving practice answer:', error);
+    }
+});
+
+    
 // Fix Video Size
 document.querySelectorAll('.video-container video').forEach(video => {
     video.style.width = '100%';
@@ -687,33 +723,180 @@ document.querySelectorAll('.video-container video').forEach(video => {
     video.style.objectFit = 'contain';
 });
 
-// Fix Button Styles
-document.querySelectorAll('button').forEach(button => {
-    button.classList.add('btn');
-});
-document.addEventListener('DOMContentLoaded', function() {
-    // Create sidebar toggle button
-    const sidebarToggle = document.createElement('button');
-    sidebarToggle.className = 'sidebar-toggle';
-    sidebarToggle.innerHTML = '←';
-    document.body.appendChild(sidebarToggle);
+class MaterialsProgress {
+    constructor() {
+        this.token = localStorage.getItem('token');
+        this.progress = {};
+    }
 
-    const sidebar = document.querySelector('.material-sidebar');
-    const content = document.querySelector('.material-content');
-    let isCollapsed = false;
+    async loadProgress() {
+        try {
+            const response = await fetch(`${API_URL}/progress/my-progress`, {
+                headers: {
+                    'Authorization': `Bearer ${this.token}`
+                }
+            });
 
-    sidebarToggle.addEventListener('click', function() {
-        isCollapsed = !isCollapsed;
-        sidebar.classList.toggle('collapsed');
-        content.classList.toggle('expanded');
-        sidebarToggle.innerHTML = isCollapsed ? '→' : '←';
-        sidebarToggle.style.left = isCollapsed ? '20px' : 'calc(var(--sidebar-width) - 15px)';
-    });
+            if (!response.ok) throw new Error('Failed to load progress');
+            const data = await response.json();
+            this.progress = data.materialProgress || {};
+            return this.progress;
+        } catch (error) {
+            console.error('Error loading progress:', error);
+            throw error;
+        }
+    }
 
-    // Fix progress text
-    const progressText = document.getElementById('progressText');
-    if (progressText && progressText.textContent === 'NaN%') {
-        progressText.textContent = '0%';
+    async updateProgress(material, progress) {
+        try {
+            const response = await fetch(`${API_URL}/progress/material`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    material: material,
+                    progress: progress // Setiap benar mendapat 25% progress
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to update progress');
+            const data = await response.json();
+            this.progress = data.materialProgress;
+            return data;
+        } catch (error) {
+            console.error('Error updating progress:', error);
+            throw error;
+        }
+    }
+
+    displayProgress() {
+        const progressBar = document.getElementById('learningProgress');
+        const progressText = document.getElementById('progressText');
+        
+        if (progressBar && progressText) {
+            const totalProgress = Object.values(this.progress).reduce((a, b) => a + b, 0) / Object.keys(this.progress).length;
+            progressBar.style.width = `${totalProgress}%`;
+            progressText.textContent = `${Math.round(totalProgress)}%`;
+        }
+    }
+}
+
+async function saveDragDropAnswer(material, questionId, userOrder, correctOrder, isCorrect) {
+    try {
+        const response = await fetch(`${API_URL}/progress/material/dragdrop`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                material,
+                questionId: '${material}_dragdrop_1',
+                userOrder,
+                correctOrder
+            })
+        });
+        
+        if (!response.ok) throw new Error('Failed to save answer');
+        const data = await response.json();
+        updateProgressDisplay(data.materialProgress);
+        //return await response.json();
+    } catch (error) {
+        console.error('Error saving drag & drop answer:', error);
+        //throw error;
+    }
+}
+
+// Handle Newton III Answer
+document.getElementById('checkNewton3')?.addEventListener('click', async() => {
+    const answerInput = document.getElementById('newton3Answer');
+    const feedback = document.getElementById('newton3Feedback');
+     // Cek apakah input kosong
+    if (!answerInput.value) {
+        feedback.textContent = 'Silakan masukkan jawaban terlebih dahulu';
+        feedback.className = 'warning';
+        return;
+    }
+    const answer = parseFloat(answerInput.value);
+    const correctAnswer = -20;
+    const isCorrect = answer === correctAnswer;
+
+    try {
+        const response = await fetch(`${API_URL}/progress/material/practice`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                material: 'newton3',
+                questionId: 'newton3_practice_1',
+                userAnswer: answer,
+                correctAnswer: correctAnswer
+            })
+        });
+
+        if (!response.ok) throw new Error('Failed to save progress');
+        const data = await response.json();
+        updateProgressDisplay(data.materialProgress);
+
+        if (isCorrect) {
+            feedback.textContent = 'Benar! Gaya berat buku (W) = m × g = 2 kg × -10 m/s² = 20 N. 20 N ini adalah Faksi buku ke bumi. Karena, Freaksi =  – Faksi maka Freaksi = –20 N (dengan arah dari bumi menuju buku). Jadi, besar gaya reaksi bumi terhadap buku adalah  –20 N.'; 
+            feedback.className = 'correct-answer';
+        } else {
+            feedback.textContent = 'Kurang tepat. Ingat bahwa gaya aksi dan reaksi besarnya sama tetapi berlawanan arah.';
+            feedback.className = 'wrong-answer';
+        }
+    } catch (error) {
+        console.error('Error saving progress:', error);
     }
 });
+
+// Hukum Ohm Answer
+document.getElementById('checkOhm')?.addEventListener('click', async () => {
+    const answerInput = document.getElementById('ohmAnswer');
+    const feedback = document.getElementById('ohmFeedback');
+    
+    // Cek apakah input kosong
+    if (!answerInput.value) {
+        feedback.textContent = 'Silakan masukkan jawaban terlebih dahulu';
+        feedback.className = 'warning';
+        return;
+    }
+    
+    const answer = parseFloat(answerInput.value);
+    const correctAnswer = 56;
+    const isCorrect = answer === correctAnswer;
+
+    try {
+        const response = await fetch(`${API_URL}/progress/material/practice`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                material: 'ohm',
+                questionId: 'ohm_practice_1',
+                userAnswer: answer,
+                correctAnswer: correctAnswer
+            })
+        });
+        if (!response.ok) throw new Error('Failed to save progress');
+        const data = await response.json();
+        updateProgressDisplay(data.materialProgress);
+
+        if (isCorrect) {
+            feedback.textContent = 'Benar! V = I × R = 7 A × 8 Ω = 56 V';
+            feedback.className = 'correct-answer';
+        } else {
+            feedback.textContent = 'Kurang tepat. Ingat rumus V = I × R';
+            feedback.className = 'wrong-answer';
+        }
+    } catch (error) {
+        console.error('Error saving progress:', error);
+    }
 });
+ 

@@ -122,7 +122,7 @@ function resetProgress() {
 }
 
 // Server-Sent Events untuk update real-time
-const evtSource = new EventSource("/api/updates");
+const evtSource = new EventSource("http://127.0.0.1:5000/api/updates");
 const updatesContainer = document.getElementById('updates-content');
 
 evtSource.onmessage = function(event) {
@@ -289,3 +289,26 @@ function saveLastVisit() {
 }
 
 window.addEventListener('beforeunload', saveLastVisit);
+
+function handleCardClick(url, event) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        event.preventDefault();
+        // Simpan URL yang dicoba diakses
+        sessionStorage.setItem('redirectAfterLogin', url);
+        // Tampilkan konfirmasi
+        const confirmLogin = confirm('Anda harus login terlebih dahulu untuk mengakses konten ini. Apakah Anda ingin login sekarang?');
+        if (confirmLogin) {
+            window.location.href = '/pages/auth/login.html';
+        }
+        return false;
+    }
+    window.location.href = url;
+}
+
+// Fungsi logout
+function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '../pages/auth/login.html';
+}
