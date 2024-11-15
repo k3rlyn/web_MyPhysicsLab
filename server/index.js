@@ -17,6 +17,7 @@ const corsOptions = {
     origin: [
         'http://localhost:3000',
         'https://k3rlyn.github.io/web_MyPhysicsLab/', 
+        'https://railway.app/project/6e271b85-0627-4880-a600-0feaf35767f3'
 
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
