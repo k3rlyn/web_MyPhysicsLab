@@ -17,6 +17,7 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
 - **About Us**: Informasi tentang Virtual Lab MyPhysicsLab.
 - **Daftar**: Memungkinkan pengguna baru untuk membuat akun di MyPhysicsLab sehingga dapat mengakses fitur Virtual Lab MyPhysicsLab secara penuh.
 - **Masuk**: Memungkinkan pengguna yang sudah memiliki akun di MyPhysicsLab untuk mengakses dan melanjutkan pembelajaran & aktivitas di Virtual Lab MyPhysicsLab.
+- **Pembaruan Real Time**: Terdapat real-time update dari server.
 
 ## Teknologi yang Digunakan
 
