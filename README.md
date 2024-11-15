@@ -32,7 +32,7 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
 - **Desain Responsif**: Menggunakan tipografi yang menarik, pemilihan warna yang tepat, dan layout yang responsif untuk pengalaman pengguna yang optimal di berbagai perangkat.
 - **Autentikasi Pengguna dan Penyimpanan State Pengguna Terautentikasi**
   
-## Cara Menggunakan
+## Cara Menggunakan & Mengakses
 
 1. **Akses Website**: Buka browser web dan kunjungi situs MyPhysicsLab di https://myphysicslab.vercel.app/.
 2. **Navigasi Menu**:
