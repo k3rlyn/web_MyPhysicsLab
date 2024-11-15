@@ -79,4 +79,4 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-mobile.exports = app;
+module.exports = app;
