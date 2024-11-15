@@ -122,7 +122,7 @@ function resetProgress() {
 }
 
 // Server-Sent Events untuk update real-time
-const evtSource = new EventSource("http://127.0.0.1:5000/api/updates");
+const evtSource = new EventSource("https://myphysicslab.vercel.app/api/updates");
 const updatesContainer = document.getElementById('updates-content');
 
 evtSource.onmessage = function(event) {
