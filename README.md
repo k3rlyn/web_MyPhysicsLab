@@ -30,7 +30,7 @@ Pembelajaran disajikan dengan cara yang menarik, interaktif, dan efektif melalui
   - Drag and Drop
 - **JavaScript**: Untuk interaktivitas dan dinamika halaman web.
 - **Desain Responsif**: Menggunakan tipografi yang menarik, pemilihan warna yang tepat, dan layout yang responsif untuk pengalaman pengguna yang optimal di berbagai perangkat.
-- **Autentikasi Pengguna dan Penyimpanan State Pengguna Terautentikasi**
+- **Autentikasi Pengguna dan Penyimpanan State Pengguna Terautentikasi** → data disimpan dengan menggunakan database dari MongoDB Atlas
   
 ## Cara Menggunakan & Mengakses
 
