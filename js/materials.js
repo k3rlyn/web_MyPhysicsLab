@@ -667,24 +667,22 @@ initDragAndDrop();
 // Add event listener for reset button
 document.getElementById('resetDragDrop').addEventListener('click', resetDragDrop);
 
-// Interactive Problem Hukum Newton 2
-document.getElementById('checkAnswer').addEventListener('click', async() => {
-    const answerInput = document.getElementById('problemAnswer');
-    const feedback = document.getElementById('answerFeedback');
+// Function untuk mengecek jawaban dan menampilkan feedback
+async function checkAnswer(material, questionId, userAnswer, correctAnswer, feedbackElement, successMessage) {
+    // Reset style
+    feedbackElement.style.display = 'block';
     
-    if (!answerInput.value) {
-        feedback.textContent = 'Masukkan jawaban terlebih dahulu!';
-        feedback.className = 'warning';
+    // Validasi input
+    if (!userAnswer && userAnswer !== 0) {
+        feedbackElement.textContent = 'Masukkan jawaban terlebih dahulu!';
+        feedbackElement.className = 'warning';
         return;
     }
-    // F = ma -> a = F/m
-    // m = 5 kg, F = 20 N
-
-    const answer = parseFloat(answerInput.value);
-    const correctAnswer = 20 / 5; // = 4 m/s²
+    const answer = parseFloat(userAnswer);
     const isCorrect = Math.abs(answer - correctAnswer) < 0.1;
-    
+
     try {
+        // Mencoba menyimpan ke API
         const response = await fetch(`${API_URL}/progress/material/practice`, {
             method: 'POST',
             headers: {
@@ -692,29 +690,49 @@ document.getElementById('checkAnswer').addEventListener('click', async() => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                material: 'newton2',
-                questionId: 'newton2_practice_1',
+                material,
+                questionId,
                 userAnswer: answer,
-                correctAnswer: correctAnswer
+                correctAnswer
             })
         });
 
-        if (!response.ok) throw new Error('Failed to save answer');
-        const data = await response.json();
-        updateProgressDisplay(data.materialProgress);
-
-        if (isCorrect) {
-            feedback.textContent = 'Benar! a = F/m = 20 N / 5 kg = 4 m/s². Jadi, percepatan benda adalah 4 m/s²';
-            feedback.className = 'correct';
-        } else {
-            feedback.textContent = 'Jawaban kurang tepat. Coba lagi!';
-            feedback.className = 'incorrect';
+        if (response.ok) {
+            const data = await response.json();
+            if (typeof updateProgressDisplay === 'function') {
+                updateProgressDisplay(data.materialProgress);
+            }
         }
     } catch (error) {
-        console.error('Error saving practice answer:', error);
+        console.warn('Error saving to API:', error);
+        // Lanjutkan menampilkan feedback meskipun ada error API
     }
-});
 
+    // Selalu tampilkan feedback terlepas dari status API
+    if (isCorrect) {
+        feedbackElement.textContent = successMessage;
+        feedbackElement.className = 'correct-answer';
+    } else {
+        feedbackElement.textContent = 'Kurang tepat. Coba lagi!';
+        feedbackElement.className = 'wrong-answer';
+    }
+}
+// Interactive Problem Hukum Newton 2
+document.getElementById('checkAnswer')?.addEventListener('click', () => {
+    const answerInput = document.getElementById('problemAnswer');
+    const feedback = document.getElementById('answerFeedback');
+    const correctAnswer = 4; // 20N / 5kg = 4 m/s²
+    const successMessage = 'Benar! a = F/m = 20 N / 5 kg = 4 m/s². Jadi, percepatan benda adalah 4 m/s²';
+    
+    checkAnswer(
+        'newton2',
+        'newton2_practice_1',
+        answerInput.value,
+        correctAnswer,
+        feedback,
+        successMessage
+    );
+});
     
 // Fix Video Size
 document.querySelectorAll('.video-container video').forEach(video => {
@@ -810,93 +828,36 @@ async function saveDragDropAnswer(material, questionId, userOrder, correctOrder,
 }
 
 // Handle Newton III Answer
-document.getElementById('checkNewton3')?.addEventListener('click', async() => {
+document.getElementById('checkNewton3')?.addEventListener('click', () => {
     const answerInput = document.getElementById('newton3Answer');
     const feedback = document.getElementById('newton3Feedback');
-     // Cek apakah input kosong
-    if (!answerInput.value) {
-        feedback.textContent = 'Silakan masukkan jawaban terlebih dahulu';
-        feedback.className = 'warning';
-        return;
-    }
-    const answer = parseFloat(answerInput.value);
     const correctAnswer = -20;
-    const isCorrect = answer === correctAnswer;
-
-    try {
-        const response = await fetch(`${API_URL}/progress/material/practice`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                material: 'newton3',
-                questionId: 'newton3_practice_1',
-                userAnswer: answer,
-                correctAnswer: correctAnswer
-            })
-        });
-
-        if (!response.ok) throw new Error('Failed to save progress');
-        const data = await response.json();
-        updateProgressDisplay(data.materialProgress);
-
-        if (isCorrect) {
-            feedback.textContent = 'Benar! Gaya berat buku (W) = m × g = 2 kg × -10 m/s² = 20 N. 20 N ini adalah Faksi buku ke bumi. Karena, Freaksi =  – Faksi maka Freaksi = –20 N (dengan arah dari bumi menuju buku). Jadi, besar gaya reaksi bumi terhadap buku adalah  –20 N.'; 
-            feedback.className = 'correct-answer';
-        } else {
-            feedback.textContent = 'Kurang tepat. Ingat bahwa gaya aksi dan reaksi besarnya sama tetapi berlawanan arah.';
-            feedback.className = 'wrong-answer';
-        }
-    } catch (error) {
-        console.error('Error saving progress:', error);
-    }
+    const successMessage = 'Benar! Gaya berat buku (W) = m × g = 2 kg × -10 m/s² = -20 N. Gaya ini adalah gaya reaksi dari bumi terhadap buku.';
+    
+    checkAnswer(
+        'newton3',
+        'newton3_practice_1',
+        answerInput.value,
+        correctAnswer,
+        feedback,
+        successMessage
+    );
 });
 
 // Hukum Ohm Answer
-document.getElementById('checkOhm')?.addEventListener('click', async () => {
+document.getElementById('checkOhm')?.addEventListener('click', () => {
     const answerInput = document.getElementById('ohmAnswer');
     const feedback = document.getElementById('ohmFeedback');
+    const correctAnswer = 56; // 7A × 8Ω = 56V
+    const successMessage = 'Benar! V = I × R = 7 A × 8 Ω = 56 V';
     
-    // Cek apakah input kosong
-    if (!answerInput.value) {
-        feedback.textContent = 'Silakan masukkan jawaban terlebih dahulu';
-        feedback.className = 'warning';
-        return;
-    }
-    
-    const answer = parseFloat(answerInput.value);
-    const correctAnswer = 56;
-    const isCorrect = answer === correctAnswer;
-
-    try {
-        const response = await fetch(`${API_URL}/progress/material/practice`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                material: 'ohm',
-                questionId: 'ohm_practice_1',
-                userAnswer: answer,
-                correctAnswer: correctAnswer
-            })
-        });
-        if (!response.ok) throw new Error('Failed to save progress');
-        const data = await response.json();
-        updateProgressDisplay(data.materialProgress);
-
-        if (isCorrect) {
-            feedback.textContent = 'Benar! V = I × R = 7 A × 8 Ω = 56 V';
-            feedback.className = 'correct-answer';
-        } else {
-            feedback.textContent = 'Kurang tepat. Ingat rumus V = I × R';
-            feedback.className = 'wrong-answer';
-        }
-    } catch (error) {
-        console.error('Error saving progress:', error);
-    }
+    checkAnswer(
+        'ohm',
+        'ohm_practice_1',
+        answerInput.value,
+        correctAnswer,
+        feedback,
+        successMessage
+    );
 });
  
